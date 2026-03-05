@@ -1,0 +1,86 @@
+<form [formGroup]="filterForm" (ngSubmit)="onSubmit()" class="filters" role="search" aria-label="Filtros de pistas">
+    <div class="filters__card">
+
+        <!-- Top Row: Search & Action -->
+        <div class="filters__search-row">
+            <div class="filters__search-input-wrap">
+                <lucide-icon [name]="Search" [size]="18" class="filters__search-icon" aria-hidden="true"></lucide-icon>
+                <input (input)="montarRuta()" pInputText formControlName="nombre"
+                    placeholder="Buscar pista por nombre..." class="filters__search-input"
+                    aria-label="Buscar pista por nombre" />
+            </div>
+
+            <div class="filters__actions">
+                <button type="button" class="filters__clear-btn" (click)="resetFilters()" aria-label="Limpiar filtros"
+                    title="Limpiar todos los filtros">
+                    <lucide-icon [name]="RefreshCcw" [size]="20" aria-hidden="true"></lucide-icon>
+                </button>
+
+                <button type="submit" class="filters__search-btn" aria-label="Buscar pistas">
+                    <lucide-icon [name]="Search" [size]="20" aria-hidden="true"></lucide-icon>
+                    <span class="filters__search-btn-text">Buscar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="filters__divider" role="separator"></div>
+
+        <!-- Bottom Row: Filters Grid -->
+        <div class="filters__grid">
+
+            <!-- Sport -->
+            <div class="filters__field">
+                <label class="filters__label" id="filter-deporte-label">
+                    <lucide-icon [name]="Activity" [size]="14" aria-hidden="true"></lucide-icon>
+                    Deporte
+                </label>
+                <p-dropdown (onChange)="montarRuta()" [options]="(deporteOptions$ | async) || []"
+                    formControlName="deporte" placeholder="Seleccionar" styleClass="filters__dropdown"
+                    [showClear]="true" aria-labelledby="filter-deporte-label">
+                </p-dropdown>
+            </div>
+
+            <!-- Availability (Date Picker) -->
+            <div class="filters__field">
+                <label class="filters__label" id="filter-disponibilidad-label">
+                    <lucide-icon [name]="Calendar" [size]="14" aria-hidden="true"></lucide-icon>
+                    Fecha
+                </label>
+                <p-calendar (onChange)="montarRuta()" formControlName="disponibilidad" dateFormat="yy-mm-dd"
+                    placeholder="Seleccionar fecha" [showIcon]="true" [showClear]="true" [minDate]="minDate"
+                    styleClass="filters__calendar" aria-labelledby="filter-disponibilidad-label">
+                </p-calendar>
+            </div>
+
+            <!-- Order -->
+            <div class="filters__field">
+                <label class="filters__label" id="filter-orden-label">
+                    <lucide-icon [name]="ArrowUpDown" [size]="14" aria-hidden="true"></lucide-icon>
+                    Orden
+                </label>
+                <p-dropdown (onChange)="montarRuta()" [options]="ordenOptions" formControlName="orden"
+                    placeholder="Ordenar por" styleClass="filters__dropdown" aria-labelledby="filter-orden-label">
+                </p-dropdown>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filters__field filters__field--slider">
+                <div class="filters__slider-header">
+                    <label class="filters__label" id="filter-precio-label">
+                        <lucide-icon [name]="Euro" [size]="14" aria-hidden="true"></lucide-icon>
+                        Precio
+                    </label>
+                    <span class="filters__price-badge" aria-label="Rango de precio seleccionado">
+                        {{ filterForm.get('precioRange')?.value?.[0] || 0 }}€ - {{
+                        filterForm.get('precioRange')?.value?.[1] || 200 }}€
+                    </span>
+                </div>
+                <p-slider (onChange)="montarRuta()" formControlName="precioRange" [range]="true" [min]="0" [max]="200"
+                    styleClass="filters__slider" aria-labelledby="filter-precio-label">
+                </p-slider>
+            </div>
+
+        </div>
+    </div>
+</form>

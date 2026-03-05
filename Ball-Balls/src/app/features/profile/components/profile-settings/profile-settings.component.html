@@ -1,0 +1,152 @@
+<div class="flex flex-col gap-8 animate-fade-in">
+    <!-- Config de Perfil Card -->
+    <div class="relative z-10 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl shadow-md p-6 md:p-8">
+        <div
+            class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 border-b border-[var(--border-color)] pb-6">
+            <div class="flex items-center gap-4">
+                <span
+                    class="w-12 h-12 rounded-full bg-[var(--accent-primary)]/10 flex items-center justify-center text-[var(--accent-primary)] text-xl">
+                    <i class="pi pi-user-edit"></i>
+                </span>
+                <div>
+                    <h3 class="text-2xl font-bold text-[var(--text-primary)]">Gestión de Perfil</h3>
+                    <p class="text-[var(--text-secondary)] text-sm mt-1">Mantén tu información personal actualizada.</p>
+                </div>
+            </div>
+            <button (click)="openEditDialog()"
+                class="px-6 py-3 bg-[var(--accent-primary)] hover:opacity-90 text-white rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 whitespace-nowrap">
+                <i class="pi pi-pencil"></i> Actualizar Perfil
+            </button>
+        </div>
+    </div>
+
+    <!-- Seguridad y Sesiones Card -->
+    <div
+        class="relative z-10 bg-[var(--bg-card)] border border-[var(--accent-error)]/30 rounded-3xl shadow-md p-6 md:p-8">
+        <div class="flex items-center gap-4 mb-6 border-b border-[var(--accent-error)]/20 pb-6">
+            <span
+                class="w-12 h-12 rounded-full bg-[var(--accent-error)]/10 flex items-center justify-center text-[var(--accent-error)] text-xl">
+                <i class="pi pi-shield"></i>
+            </span>
+            <div>
+                <h3 class="text-2xl font-bold text-[var(--text-primary)]">Seguridad y Sesiones</h3>
+                <p class="text-[var(--text-secondary)] text-sm mt-1">Gestiona la seguridad de tu cuenta.</p>
+            </div>
+        </div>
+
+        <div
+            class="bg-[var(--accent-error)]/5 hover:bg-[var(--accent-error)]/10 border border-[var(--accent-error)]/20 rounded-2xl p-6 flex flex-col gap-6 transition-colors">
+
+            <div
+                class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-[var(--accent-error)]/10 pb-6 text-center md:text-left">
+                <div>
+                    <h4
+                        class="text-lg font-bold text-[var(--accent-error)] flex items-center justify-center md:justify-start gap-2">
+                        <i class="pi pi-sign-out text-sm"></i> Cerrar Sesión
+                    </h4>
+                    <p class="text-[var(--text-secondary)] mt-1 max-w-lg">Cierra la sesión actual en este dispositivo de
+                        forma segura.</p>
+                </div>
+                <button (click)="confirmLogout()"
+                    class="px-6 py-2.5 bg-[var(--accent-error)]/10 hover:bg-[var(--accent-error)] border border-[var(--accent-error)] text-[var(--accent-error)] hover:text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="pi pi-sign-out"></i> Cerrar Sesión
+                </button>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+                <div>
+                    <h4
+                        class="text-lg font-bold text-[var(--accent-error)] flex items-center justify-center md:justify-start gap-2">
+                        <i class="pi pi-desktop text-sm"></i> Cerrar Sesión Global
+                    </h4>
+                    <p class="text-[var(--text-secondary)] mt-1 max-w-lg">Invalida todos tus tokens de acceso actuales.
+                        Tendrás que volver a iniciar sesión en todos tus dispositivos activos de forma inmediata.</p>
+                </div>
+                <button (click)="confirmLogoutAll()"
+                    class="px-6 py-3 bg-[var(--accent-error)] hover:opacity-90 text-white rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2 whitespace-nowrap transform hover:-translate-y-0.5">
+                    <i class="pi pi-power-off"></i> Cerrar en todos lados
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Dialog -->
+<p-dialog [header]="'Actualizar Perfil'" [(visible)]="showDialog" [modal]="true"
+    [style]="{ width: '90vw', marginTop: '80px', marginBottom: '1rem' }" [position]="'top'" styleClass="dark-dialog"
+    [draggable]="false" [resizable]="false" [dismissableMask]="true" [closeOnEscape]="true" [maximizable]="false"
+    [contentStyle]="{ 'padding': '2rem' }">
+
+    <form [formGroup]="updateForm" (ngSubmit)="onSubmitUpdate()"
+        class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pt-2">
+        <div
+            class="flex flex-col gap-2 relative col-span-1 bg-[var(--bg-body)] border border-[var(--border-color)]/50 p-5 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <label class="font-bold text-[var(--text-primary)] text-sm">Nombre de Usuario</label>
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-at text-[var(--text-secondary)]"></i>
+                <input type="text" pInputText formControlName="username" placeholder="Tu username"
+                    class="w-full text-lg py-3 rounded-xl border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-colors" />
+            </span>
+        </div>
+
+        <div
+            class="flex flex-col gap-2 relative col-span-1 bg-[var(--bg-body)] border border-[var(--border-color)]/50 p-5 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <label class="font-bold text-[var(--text-primary)] text-sm">Nombre Completo</label>
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-user text-[var(--text-secondary)]"></i>
+                <input type="text" pInputText formControlName="nombre" placeholder="Tu Nombre Completo"
+                    class="w-full text-lg py-3 rounded-xl border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-colors" />
+            </span>
+            @if(updateForm.get('nombre')?.invalid && updateForm.get('nombre')?.touched) {
+            <small class="text-[var(--accent-error)] font-medium absolute bottom-1 right-5"><i
+                    class="pi pi-info-circle mr-1"></i> Obligatorio</small>
+            }
+        </div>
+
+        <div
+            class="flex flex-col gap-2 relative col-span-1 md:col-span-2 bg-[var(--bg-body)] border border-[var(--border-color)]/50 p-5 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <label class="font-bold text-[var(--text-primary)] text-sm">Correo Electrónico</label>
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-envelope text-[var(--text-secondary)]"></i>
+                <input type="email" pInputText formControlName="email" placeholder="correo@ejemplo.com"
+                    class="w-full text-lg py-3 rounded-xl border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-colors" />
+            </span>
+            @if(updateForm.get('email')?.invalid && updateForm.get('email')?.touched) {
+            <small class="text-[var(--accent-error)] font-medium absolute bottom-1 right-5"><i
+                    class="pi pi-info-circle mr-1"></i> Inválido</small>
+            }
+        </div>
+
+        <div
+            class="flex flex-col gap-2 relative col-span-1 bg-[var(--bg-body)] border border-[var(--border-color)]/50 p-5 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <label class="font-bold text-[var(--text-primary)] text-sm">Contraseña (opcional)</label>
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-lock text-[var(--text-secondary)]"></i>
+                <input type="password" pInputText formControlName="password"
+                    placeholder="Dejar en blanco para no cambiar"
+                    class="w-full text-lg py-3 rounded-xl border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-colors" />
+            </span>
+        </div>
+
+        <div
+            class="flex flex-col gap-2 relative col-span-1 bg-[var(--bg-body)] border border-[var(--border-color)]/50 p-5 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <label class="font-bold text-[var(--text-primary)] text-sm">URL Foto Perfil (opcional)</label>
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-image text-[var(--text-secondary)]"></i>
+                <input type="text" pInputText formControlName="fotoPerfil" placeholder="https://..."
+                    class="w-full text-lg py-3 rounded-xl border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-colors" />
+            </span>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-4 pt-5 border-t border-[var(--border-color)] md:col-span-2">
+            <button type="button" (click)="closeEditDialog()"
+                class="px-6 py-2.5 rounded-xl font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-body)] transition-colors">
+                Cancelar
+            </button>
+            <button type="submit" [disabled]="updateForm.invalid"
+                class="px-6 py-2.5 rounded-xl font-bold text-white bg-[var(--accent-primary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all">
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+</p-dialog>

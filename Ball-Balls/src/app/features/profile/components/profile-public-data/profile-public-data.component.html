@@ -1,0 +1,48 @@
+<div
+    class="animate-fade-in relative z-10 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl shadow-md p-6 md:p-8">
+    <h3
+        class="text-2xl font-bold text-[var(--text-primary)] mb-8 flex items-center gap-3 border-b border-[var(--border-color)] pb-4">
+        <span
+            class="w-10 h-10 rounded-full bg-[var(--accent-primary)]/10 flex items-center justify-center text-[var(--accent-primary)]">
+            <i class="pi pi-id-card"></i>
+        </span>
+        Datos Públicos
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+            class="bg-[var(--bg-body)] px-6 py-5 rounded-2xl border border-[var(--border-color)] shadow-sm hover:shadow-md transition-shadow">
+            <p
+                class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <i class="pi pi-user text-[var(--text-secondary)]"></i> Nombre Completo
+            </p>
+            <p class="text-lg font-semibold text-[var(--text-primary)]">{{ profile()?.nombre || 'No especificado' }}</p>
+        </div>
+        <div
+            class="bg-[var(--bg-body)] px-6 py-5 rounded-2xl border border-[var(--border-color)] shadow-sm hover:shadow-md transition-shadow">
+            <p
+                class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <i class="pi pi-at text-[var(--text-secondary)]"></i> Usuario
+            </p>
+            <p class="text-lg font-semibold text-[var(--text-primary)]">{{ profile()?.username }}</p>
+        </div>
+
+        @if(isCurrentUser()) {
+        <div
+            class="bg-[var(--bg-body)] px-6 py-5 rounded-2xl border border-[var(--border-color)] shadow-sm hover:shadow-md transition-shadow md:col-span-2">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p
+                        class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i class="pi pi-envelope text-[var(--text-secondary)]"></i> Correo Electrónico (Privado)
+                    </p>
+                    <p class="text-lg font-semibold text-[var(--text-primary)]">{{ profile()?.email }}</p>
+                </div>
+                <span
+                    class="bg-[var(--text-muted)]/10 text-[var(--text-secondary)] text-xs px-2.5 py-1 rounded-md border border-[var(--text-muted)]/20 font-medium">Solo
+                    visible para ti</span>
+            </div>
+        </div>
+        }
+    </div>
+</div>

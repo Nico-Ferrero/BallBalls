@@ -1,0 +1,74 @@
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom PrimeNG Dialog overrides to match Dark Theme aesthetics */
+::ng-deep .dark-dialog {
+    border-radius: 1.5rem !important;
+    overflow: hidden;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+::ng-deep .dark-dialog .p-dialog-header {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 1.5rem 1.5rem 1rem 1.5rem !important;
+}
+
+::ng-deep .dark-dialog .p-dialog-header .p-dialog-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+}
+
+::ng-deep .dark-dialog .p-dialog-header-icons .p-dialog-header-icon {
+    color: var(--text-secondary) !important;
+    border-radius: 50% !important;
+    transition: all 0.2s !important;
+}
+
+::ng-deep .dark-dialog .p-dialog-header-icons .p-dialog-header-icon:hover {
+    background: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+}
+
+::ng-deep .dark-dialog .p-dialog-content {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    padding: 0 1.5rem 1.5rem 1.5rem !important;
+}
+
+/* Custom InputOverrrides */
+::ng-deep .p-inputtext {
+    background: var(--bg-body) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+::ng-deep .p-inputtext:enabled:hover {
+    border-color: #3b82f6 !important;
+}
+
+::ng-deep .p-inputtext:enabled:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Fix primeicons in input groups */
+::ng-deep .p-input-icon-left > i, 
+::ng-deep .p-input-icon-right > i {
+    z-index: 10;
+}

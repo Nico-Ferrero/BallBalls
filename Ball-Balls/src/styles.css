@@ -1,0 +1,334 @@
+/* Google Fonts - MUST be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* PrimeNG Styles */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.min.css";
+
+/* TailwindCSS Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ball&Balls CSS Variables - Design System */
+:root {
+    /* Light Mode Colors */
+    --bg-primary: #F1FAEE;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #E8F5E9;
+    --bg-card: #FFFFFF;
+
+    --text-primary: #1D3557;
+    --text-secondary: #457B9D;
+    --text-muted: #6C8EA4;
+
+    --accent-primary: #E63946;
+    --accent-secondary: #457B9D;
+    --accent-tertiary: #A8DADC;
+    --accent-warning: #F4A261;
+    --accent-error: #D62828;
+    --accent-success: #2E7D32;
+    --accent-info: #457B9D;
+
+    --border-color: #A8DADC;
+    --shadow: 0 4px 12px rgba(29, 53, 87, 0.08);
+
+    /* Typography */
+    --font-sans: 'Inter', 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Spacing */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+
+    /* Transitions */
+    --transition-default: 200ms ease-out;
+    --transition-slow: 300ms ease-out;
+}
+
+/* Dark Mode Colors */
+.dark {
+    --bg-primary: #0F1C2E;
+    --bg-secondary: #1D3557;
+    --bg-tertiary: #274060;
+    --bg-card: #1D3557;
+
+    --text-primary: #F1FAEE;
+    --text-secondary: #D1E7F5;
+    /* Lighter Blue for better contrast */
+    --text-muted: #A8DADC;
+    /* Was secondary, now muted (still legible) */
+
+    --accent-primary: #EF5350;
+    --accent-secondary: #6798B5;
+    --accent-tertiary: #3A5A78;
+    --accent-warning: #FFB74D;
+    --accent-error: #E57373;
+    --accent-success: #81C784;
+    --accent-info: #64B5F6;
+
+    --border-color: #2C4A6F;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Base Styles */
+html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color var(--transition-slow), color var(--transition-slow);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus States - Accessibility */
+*:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.3);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-secondary);
+}
+
+/* PrimeNG Theme Overrides */
+.p-component {
+    font-family: var(--font-sans) !important;
+}
+
+.p-button {
+    background-color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all var(--transition-default);
+}
+
+.p-button:hover {
+    background-color: #D32F3E !important;
+    transform: translateY(-1px);
+}
+
+.p-button.p-button-secondary {
+    background-color: var(--accent-secondary) !important;
+    border-color: var(--accent-secondary) !important;
+}
+
+.p-button.p-button-outlined {
+    background-color: transparent !important;
+    color: var(--accent-primary) !important;
+    border: 2px solid var(--accent-primary) !important;
+}
+
+.p-inputtext {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    transition: all var(--transition-default);
+}
+
+.p-inputtext:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+}
+
+.p-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.p-dialog {
+    background-color: var(--bg-card);
+    border-radius: 16px;
+}
+
+.p-toast {
+    font-family: var(--font-sans);
+}
+
+/* FullCalendar Theme Overrides */
+.fc {
+    --fc-border-color: var(--border-color);
+    --fc-button-bg-color: var(--accent-secondary);
+    --fc-button-hover-bg-color: var(--accent-primary);
+    --fc-button-active-bg-color: var(--accent-primary);
+    --fc-today-bg-color: rgba(168, 218, 220, 0.2);
+    --fc-event-bg-color: var(--accent-secondary);
+    --fc-event-border-color: var(--accent-secondary);
+    --fc-now-indicator-color: var(--accent-primary);
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: var(--border-color);
+}
+
+.fc-timegrid-slot-minor {
+    border-top-style: dotted;
+}
+
+/* SweetAlert2 Theme Overrides */
+.swal2-popup {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-radius: 16px !important;
+}
+
+.swal2-title {
+    color: var(--text-primary) !important;
+}
+
+.swal2-html-container {
+    color: var(--text-secondary) !important;
+}
+
+.swal2-confirm {
+    background-color: var(--accent-primary) !important;
+}
+
+.swal2-cancel {
+    background-color: var(--accent-secondary) !important;
+}
+
+/* Chart.js Global Styles */
+canvas {
+    font-family: var(--font-sans) !important;
+}
+
+/* Utility Classes */
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glassmorphism {
+    background: rgba(29, 53, 87, 0.5);
+    border: 1px solid rgba(168, 218, 220, 0.2);
+}
+
+.card-hover {
+    transition: transform var(--transition-default), box-shadow var(--transition-default);
+}
+
+.card-hover:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(29, 53, 87, 0.12);
+}
+
+.dark .card-hover:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Skeleton Loading Animation */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Category Pills */
+.category-pill {
+    @apply px-4 py-2 rounded-full border border-solid font-medium text-sm transition-all duration-200;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.category-pill:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.category-pill.active {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #FFFFFF;
+}
+
+/* Status Badges */
+.badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.badge-available {
+    background-color: rgba(70, 123, 157, 0.15);
+    color: var(--accent-secondary);
+}
+
+.badge-occupied {
+    background-color: rgba(244, 162, 97, 0.15);
+    color: var(--accent-warning);
+}
+
+.badge-maintenance {
+    background-color: rgba(108, 142, 164, 0.15);
+    color: var(--text-muted);
+}
+
+/* Number/Stats Display (ELO, Prices) */
+.stat-number {
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+.price-tag {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--accent-primary);
+}

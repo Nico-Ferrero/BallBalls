@@ -1,0 +1,53 @@
+<div
+    class="bg-gradient-to-br from-bg-primary via-blue-50 to-white dark:from-bg-primary dark:via-[#152e4d] dark:to-bg-card min-h-[calc(100vh-80px)] animate-gradient-bg relative overflow-hidden">
+
+
+
+    <section class="max-w-7xl mx-auto px-4 pt-16 pb-12 flex flex-col items-center text-center relative z-10">
+
+        <!-- Lottie Background -->
+        <div
+            class="absolute inset-0 w-full h-full flex justify-center items-start -translate-y-12 md:-translate-y-24 pointer-events-none -z-10 opacity-30">
+            <ng-lottie [options]="options"></ng-lottie>
+        </div>
+
+        <!-- Hero Text -->
+        <h1
+            class="text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 flex flex-wrap justify-center gap-x-2">
+            <span class="flex">
+                @for (letter of titleText; track $index) {
+                <span class="animate-bounce-letter" [style.animation-delay]="$index * 0.05 + 's'">
+                    @if (letter === ' ') { &nbsp; } @else { {{ letter }} }
+                </span>
+                }
+            </span>
+            <span class="flex text-accent-primary">
+                @for (letter of highlightText; track $index) {
+                <span class="animate-bounce-letter" [style.animation-delay]="(titleText.length + $index) * 0.05 + 's'">
+                    {{ letter }}
+                </span>
+                }
+            </span>
+        </h1>
+        <p
+            class="text-lg md:text-xl text-secondary max-w-2xl mb-12 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
+            Reserva pistas de pádel, tenis y fútbol en los mejores clubes. Rápido, sencillo y sin comisiones ocultas.
+        </p>
+
+        <!-- Search Bar -->
+        <app-filtros-home />
+
+        <!-- Sports Pills Section -->
+        <div class="w-full max-w-5xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
+            <h2 class="text-2xl font-bold text-primary mb-6 text-left px-4 md:px-0">Explora por deportes</h2>
+            <app-list-deportes></app-list-deportes>
+        </div>
+
+        <!-- Pistas Disponibles Hoy Section -->
+        <div class="w-full max-w-5xl mt-16 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-500">
+            <app-list-pistas-home></app-list-pistas-home>
+        </div>
+
+    </section>
+
+</div>

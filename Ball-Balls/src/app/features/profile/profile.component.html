@@ -1,0 +1,53 @@
+<div class="profile-container min-h-screen bg-[var(--bg-body)]">
+    <app-profile-header [profile]="profile()" [isLoading]="isLoading()" [isCurrentUser]="isCurrentUser()">
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Left Sidebar Navigation -->
+            <div class="lg:col-span-1">
+                <app-profile-sidebar [activeTab]="activeTab()" [isCurrentUser]="isCurrentUser()"
+                    (tabChange)="setTab($event)">
+                </app-profile-sidebar>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-3">
+                @if (isLoading()) {
+                <div
+                    class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-8 shadow-md min-h-[400px]">
+                    <p-skeleton width="40%" height="2.5rem" styleClass="mb-8"></p-skeleton>
+                    <p-skeleton width="100%" height="5rem" styleClass="mb-6 rounded-2xl"></p-skeleton>
+                    <p-skeleton width="100%" height="5rem" styleClass="mb-6 rounded-2xl"></p-skeleton>
+                    <p-skeleton width="70%" height="5rem" styleClass="rounded-2xl"></p-skeleton>
+                </div>
+                } @else if (profile()) {
+                @switch (activeTab()) {
+                @case ('public') {
+                <app-profile-public-data [profile]="profile()" [isCurrentUser]="isCurrentUser()">
+                </app-profile-public-data>
+                }
+
+                @case ('settings') {
+                <app-profile-settings [profile]="profile()">
+                </app-profile-settings>
+                }
+                }
+                } @else if (error()) {
+                <div
+                    class="flex flex-col items-center justify-center p-12 bg-[var(--accent-error)]/5 border border-[var(--accent-error)]/20 rounded-3xl text-center shadow-md">
+                    <div
+                        class="w-20 h-20 rounded-full bg-[var(--accent-error)]/10 flex items-center justify-center text-[var(--accent-error)] text-4xl mb-6">
+                        <i class="pi pi-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[var(--text-primary)]">Error al cargar perfil</h3>
+                    <p class="text-[var(--text-secondary)] mt-3 max-w-md">No se pudo recuperar la información del
+                        usuario o hubo un problema de conexión con el servidor.</p>
+                    <button (click)="ngOnInit()"
+                        class="mt-6 px-6 py-2.5 bg-[var(--bg-body)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl hover:bg-[var(--bg-card)] transition-colors font-medium">
+                        <i class="pi pi-refresh mr-2"></i> Reintentar
+                    </button>
+                </div>
+                }
+            </div>
+        </div>
+    </app-profile-header>
+</div>

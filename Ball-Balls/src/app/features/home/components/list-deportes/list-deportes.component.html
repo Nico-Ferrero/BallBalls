@@ -1,0 +1,52 @@
+<div class="w-full py-2">
+
+    <!-- Loading State -->
+    @if (isLoading$ | async) {
+    <div class="flex gap-4 min-w-max px-2 overflow-hidden">
+        @for (item of [1,2,3,4,5,6,7,8]; track item) {
+        <div class="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse shrink-0"></div>
+        }
+    </div>
+    }
+
+    <!-- Error State -->
+    @if (error$ | async) {
+    <div class="text-accent-error text-sm font-medium px-4">
+        Error cargando deportes.
+    </div>
+    }
+
+    <!-- Data State -->
+    @if (deportes$ | async; as deportes) {
+    <!-- Swiper Container -->
+    <!-- slides-per-view="auto" allows variable width slides based on content -->
+    <swiper-container slides-per-view="auto" space-between="12" free-mode="true" class="px-1">
+        @for (deporte of deportes; track deporte.slug) {
+        <swiper-slide class="w-auto">
+            <button (click)="onSearch(deporte.slug)" class="
+            group relative
+            px-6 py-2.5
+            rounded-full
+            bg-card dark:bg-card
+            border border-border-color
+            hover:border-accent-primary hover:bg-accent-primary
+            transition-all duration-300
+            active:scale-95
+            shadow-sm hover:shadow-md
+            flex items-center gap-2
+            cursor-pointer
+          ">
+                <span class="
+              text-sm font-semibold
+              text-primary group-hover:text-white
+              whitespace-nowrap
+              transition-colors
+            ">
+                    {{ deporte.nombre }}
+                </span>
+            </button>
+        </swiper-slide>
+        }
+    </swiper-container>
+    }
+</div>

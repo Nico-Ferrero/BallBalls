@@ -1,0 +1,965 @@
+================================================================================
+                    BALL&BALLS - UI/UX DESIGN GUIDELINES
+                    Senior Design Specification Document
+                    Version 2.0 - February 2026
+================================================================================
+
+## PROJECT OVERVIEW
+================================================================================
+
+Ball&Balls is a comprehensive sports facility management platform that combines:
+- Court booking system (like Airbnb for sports courts)
+- Competitive ranking system (ELO-based like chess.com)
+- Club management (mini-SaaS for sports organizations)
+- Tournament organization and matchmaking
+
+Target: Sports enthusiasts, club managers, and facility administrators.
+Framework: Angular v21 + PrimeNG + TailwindCSS.
+Backend: ASP.NET Core with Clean Architecture (source of truth for data models).
+
+================================================================================
+## DESIGN PHILOSOPHY - THE 80/20 RULE
+================================================================================
+
+80% FAMILIAR PATTERNS (from Airbnb + Playtomic):
+- Users should feel instantly comfortable
+- Zero learning curve for core actions
+- Validated UX patterns that work at scale
+
+20% UNIQUE DIFFERENTIATORS (Ball&Balls identity):
+- Premium sports aesthetic
+- ELO visualization (gaming-inspired)
+- Club theming (dynamic color schemes per club)
+
+================================================================================
+## COLOR SYSTEM - DUAL THEME SUPPORT
+================================================================================
+
+The application MUST support both light and dark modes with a theme toggle.
+Use CSS custom properties (variables) for all colors.
+
+### FINAL PALETTE: "Ball&Balls Official"
+--------------------------------------------------------------------------------
+Reference: https://coolors.co/e63946-f1faee-a8dadc-457b9d-1d3557
+
+Primary Colors:
+  - Imperial Red (Primary/CTA): #E63946
+  - Honeydew (Light BG): #F1FAEE
+  - Powder Blue (Secondary BG/Accent): #A8DADC
+  - Cerulean (Focus/Secondary Text): #457B9D
+  - Prussian Blue (Dark BG/Primary Text): #1D3557
+
+LIGHT MODE:
+  --bg-primary: #F1FAEE         // Honeydew (Main background)
+  --bg-secondary: #FFFFFF       // White (Cards, inputs)
+  --bg-tertiary: #E8F5E9        // Lighter Honeydew variant
+  --bg-card: #FFFFFF
+
+  --text-primary: #1D3557       // Prussian Blue (Headings, body)
+  --text-secondary: #457B9D     // Cerulean (Meta, labels)
+  --text-muted: #6C8EA4         // Muted Blue-Grey
+
+  --accent-primary: #E63946     // Imperial Red (CTAs, important)
+  --accent-secondary: #457B9D   // Cerulean (Secondary buttons, links)
+  --accent-tertiary: #A8DADC    // Powder Blue (Borders, subtle highlights)
+  --accent-warning: #F4A261     // Earthy Orange
+  --accent-error: #D62828       // Dark Red
+  --accent-info: #457B9D        // Cerulean
+
+  --border-color: #A8DADC       // Powder Blue
+  --shadow: 0 4px 12px rgba(29, 53, 87, 0.08) // Prussian Blue shadow
+
+DARK MODE:
+  --bg-primary: #0F1C2E         // Deep Dark Blue (Darker than Prussian)
+  --bg-secondary: #1D3557       // Prussian Blue (Cards)
+  --bg-tertiary: #274060        // Lighter Blue (Elevated Surfaces)
+  --bg-card: #1D3557
+
+  --text-primary: #F1FAEE       // Honeydew (Main text)
+  --text-secondary: #A8DADC     // Powder Blue (Secondary text)
+  --text-muted: #8EABB8         // Muted Blue
+
+  --accent-primary: #EF5350     // Lighter Red for contrast
+  --accent-secondary: #6798B5   // Soft Cerulean
+  --accent-tertiary: #3A5A78    // Muted Blue
+  --accent-warning: #FFB74D     // Light Orange
+  --accent-error: #E57373       // Salmon Red
+  --accent-info: #64B5F6        // Light Blue
+
+  --border-color: #2C4A6F       // Deep Blue Border
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.4)
+
+--------------------------------------------------------------------------------
+### THEME TOGGLE COMPONENT
+--------------------------------------------------------------------------------
+
+Structure:
+  [☀️ | 🌙]  or  [Light | Dark]  toggle button
+
+Implementation:
+  - Use a button/switch in the header
+  - Store preference in localStorage key: 'ballballs-theme'
+  - Default to system preference: prefers-color-scheme
+  - Toggle applies class 'dark' to <html> element
+  - All color variables defined in :root and .dark scope
+
+CSS Example:
+  :root {
+    --bg-primary: #FFFFFF;
+    /* ... light mode colors */
+  }
+  
+  .dark {
+    --bg-primary: #0F172A;
+    /* ... dark mode colors */
+  }
+
+================================================================================
+## TYPOGRAPHY
+================================================================================
+
+Font Stack:
+  Primary: 'Inter', 'Outfit', sans-serif
+  Monospace: 'JetBrains Mono' (for stats, prices)
+
+Scale:
+  --text-xs: 0.75rem      // 12px - Labels, badges
+  --text-sm: 0.875rem     // 14px - Secondary text
+  --text-base: 1rem       // 16px - Body text
+  --text-lg: 1.125rem     // 18px - Subtitles
+  --text-xl: 1.25rem      // 20px - Card titles
+  --text-2xl: 1.5rem      // 24px - Section headers
+  --text-3xl: 1.875rem    // 30px - Page titles
+  --text-4xl: 2.25rem     // 36px - Hero titles
+  --text-5xl: 3rem        // 48px - Big numbers (ELO, stats)
+
+Weights:
+  Regular: 400 (body text)
+  Medium: 500 (subtitles, labels)
+  Semibold: 600 (buttons, nav items)
+  Bold: 700 (headings, emphasis)
+
+================================================================================
+## RECOMMENDED LIBRARIES & TOOLS
+================================================================================
+
+These libraries are REQUIRED or HIGHLY RECOMMENDED to achieve a premium UI/UX.
+All must be styled to match the Ball&Balls palette and design language.
+
+### UI COMPONENT LIBRARY
+--------------------------------------------------------------------------------
+
+**PrimeNG** (REQUIRED)
+  - URL: https://primeng.org
+  - Version: Latest (v17+)
+  - Use for: All form components, tables, dialogs, menus, overlays
+  - Key Components:
+    * p-button, p-inputtext, p-dropdown, p-calendar
+    * p-table (for admin data grids)
+    * p-dialog, p-sidebar, p-toast
+    * p-menu, p-menubar, p-breadcrumb
+    * p-card, p-panel, p-accordion
+    * p-paginator, p-skeleton (loading states)
+    * p-rating (for reviews)
+    * p-chip, p-tag, p-badge
+  
+  STYLING NOTES:
+    - Override ALL default PrimeNG themes
+    - Create custom theme using Ball&Balls palette
+    - Use PrimeNG's CSS variable system for easy theming
+    - Import only the components you use (tree-shaking)
+
+### CALENDAR & SCHEDULING
+--------------------------------------------------------------------------------
+
+**FullCalendar** (REQUIRED for booking system)
+  - URL: https://fullcalendar.io/docs/angular
+  - Package: @fullcalendar/angular
+  - Use for: Court availability calendar, booking time slots
+  - Views needed:
+    * timeGridWeek (primary view for court availability)
+    * timeGridDay (mobile view)
+    * dayGridMonth (overview)
+  
+  Configuration:
+    - slotMinTime: '07:00:00'
+    - slotMaxTime: '23:00:00'
+    - slotDuration: '01:00:00'
+    - selectable: true (for booking)
+    - eventColor: Use palette colors based on status
+    - nowIndicator: true
+  
+  STYLING NOTES:
+    - Override .fc-* classes to match palette
+    - Available slots: var(--accent-secondary) / Cerulean
+    - Booked slots: var(--text-muted)
+    - Selected slot: var(--accent-primary) / Imperial Red
+    - Current time indicator: var(--accent-primary)
+
+### NOTIFICATIONS & ALERTS
+--------------------------------------------------------------------------------
+
+**SweetAlert2** (REQUIRED)
+  - URL: https://sweetalert2.github.io
+  - Package: sweetalert2, @sweetalert2/ngx-sweetalert2
+  - Use for: Confirmations, success messages, error alerts
+  - Patterns:
+    * Booking confirmation
+    * Delete confirmation (with cancel option)
+    * Payment success
+    * Error notifications
+  
+  Custom Configuration:
+    confirmButtonColor: '#E63946'      // Imperial Red
+    cancelButtonColor: '#457B9D'       // Cerulean
+    background: '#FFFFFF' (light) / '#1D3557' (dark)
+    color: '#1D3557' (light) / '#F1FAEE' (dark)
+    iconColor: Use semantic colors (success=green, error=red)
+  
+  STYLING NOTES:
+    - Create reusable service: AlertService
+    - Define preset templates: confirmDelete(), showSuccess(), showError()
+    - Add custom icons matching app style
+
+**ngx-toastr** (Alternative for quick toasts)
+  - URL: https://www.npmjs.com/package/ngx-toastr
+  - Use for: Quick feedback (saved, copied, minor errors)
+  - Position: top-right
+  - Duration: 3000ms default
+
+### CHARTS & DATA VISUALIZATION
+--------------------------------------------------------------------------------
+
+**Chart.js + ng2-charts** (REQUIRED for ELO/Stats)
+  - URL: https://www.chartjs.org
+  - Package: chart.js, ng2-charts
+  - Use for:
+    * ELO rating history (line chart)
+    * Win/Loss statistics (doughnut/pie)
+    * Booking trends (bar chart)
+    * Revenue analytics (admin dashboard)
+  
+  Custom Configuration:
+    - Font: 'Inter'
+    - Grid lines: var(--border-color)
+    - Primary line: var(--accent-primary)
+    - Secondary line: var(--accent-secondary)
+    - Tooltip: var(--bg-card) background
+  
+  Chart Types:
+    * Line: ELO progression over time
+    * Doughnut: Win/Draw/Loss ratio
+    * Bar: Monthly reservations
+    * Radar: Player skill breakdown (future)
+
+**ApexCharts** (Alternative - more modern look)
+  - URL: https://apexcharts.com
+  - Package: ng-apexcharts
+  - Better animations and interactivity than Chart.js
+  - Use if more advanced charts are needed
+
+### ANIMATIONS & MICRO-INTERACTIONS
+--------------------------------------------------------------------------------
+
+**Angular Animations** (Built-in - USE THIS)
+  - Use for: Page transitions, component enter/leave
+  - Patterns: fade, slideIn, scale
+
+**lottie-web** (RECOMMENDED)
+  - URL: https://www.npmjs.com/package/lottie-web
+  - Package: lottie-web
+  - NOTE: Using lottie-web directly instead of ngx-lottie (Angular 18+ required)
+  - Use for: 
+    * Loading spinners (custom branded)
+    * Success animations (checkmark)
+    * Empty states (no results illustration)
+    * Onboarding illustrations
+  - Source: LottieFiles.com (find sports-themed animations)
+  - Usage in Angular:
+    ```typescript
+    import lottie from 'lottie-web';
+    
+    // In component ngAfterViewInit:
+    lottie.loadAnimation({
+      container: this.animationContainer.nativeElement,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: 'assets/animations/loading.json'
+    });
+    ```
+
+**AOS (Animate On Scroll)** (OPTIONAL)
+  - URL: https://michalsnik.github.io/aos/
+  - Use for: Landing page scroll animations
+  - Keep subtle: fade-up, fade-in only
+  - Disable for prefers-reduced-motion users
+
+### IMAGE HANDLING
+--------------------------------------------------------------------------------
+
+**NgOptimizedImage** (REQUIRED - Angular built-in)
+  - Use for: ALL static images
+  - Enables: Lazy loading, srcset, priority hints
+  - Pattern: <img ngSrc="..." width="..." height="..." priority />
+
+**Swiper.js** (REQUIRED for carousels)
+  - URL: https://swiperjs.com
+  - Package: swiper
+  - Use for:
+    * Court image galleries (listing cards)
+    * Hero section slider (if needed)
+    * Testimonials carousel
+  
+  Configuration:
+    - pagination: { clickable: true }
+    - navigation: true (arrows)
+    - loop: true
+    - autoplay: { delay: 5000 } (optional)
+  
+  STYLING NOTES:
+    - Pagination dots: var(--accent-primary)
+    - Navigation arrows: var(--text-secondary)
+
+### FORMS & VALIDATION
+--------------------------------------------------------------------------------
+
+**Angular Reactive Forms** (REQUIRED - built-in)
+  - Use for: ALL forms
+  - Never use Template-driven forms
+
+**ngx-mask** (RECOMMENDED)
+  - URL: https://www.npmjs.com/package/ngx-mask
+  - Use for: Phone numbers, credit cards, time inputs
+
+**@angular/cdk** (REQUIRED)
+  - Use for: Overlays, drag-drop, virtual scrolling
+  - Virtual scrolling: For long lists (admin tables)
+  - Drag-drop: Reordering, kanban boards
+
+### MAPS (Future Feature)
+--------------------------------------------------------------------------------
+
+**Leaflet** (OPTIONAL)
+  - Use for: Court location, nearby facilities
+
+### DATE/TIME UTILITIES
+--------------------------------------------------------------------------------
+
+**date-fns** (RECOMMENDED over Moment.js)
+  - URL: https://date-fns.org
+  - Lighter than Moment.js
+  - Tree-shakeable
+  - Use for: Date formatting, relative time ("3 hours ago")
+
+### STATE MANAGEMENT
+--------------------------------------------------------------------------------
+
+**NgRx (Redux for Angular)** (REQUIRED)
+  - URL: https://ngrx.io
+  - Packages: @ngrx/store, @ngrx/effects, @ngrx/entity, @ngrx/store-devtools
+  - Use for: Global application state management
+  
+  Structure:
+    store/
+    ├── pistas/
+    │   ├── pistas.actions.ts
+    │   ├── pistas.reducer.ts
+    │   ├── pistas.selectors.ts
+    │   └── pistas.effects.ts
+    ├── reservas/
+    ├── deportes/
+    ├── auth/
+    └── app.state.ts
+  
+  Key Patterns:
+    - @ngrx/entity: For normalized CRUD collections (Pistas, Reservas)
+    - @ngrx/effects: For async operations (API calls)
+    - @ngrx/store-devtools: For Redux DevTools debugging
+    - Selectors: Use createSelector() for derived state
+  
+  Guidelines:
+    - Keep actions descriptive: [Pistas] Load Pistas Success
+    - Use entity adapter for collections
+    - Handle loading/error states in each feature
+    - Combine with Angular Signals for local component state
+
+**Angular Signals** (For local component state)
+  - Use for: UI state that doesn't need to be shared
+  - Examples: form visibility, local toggles, computed values
+
+### ICONS
+--------------------------------------------------------------------------------
+
+**Lucide Icons** (RECOMMENDED)
+  - URL: https://lucide.dev
+  - Package: lucide-angular
+  - Modern, clean icon set
+  - Consistent with premium aesthetic
+
+**PrimeIcons** (INCLUDED with PrimeNG)
+  - Use when Lucide doesn't have what you need
+
+**Phosphor Icons** (ALTERNATIVE)
+  - URL: https://phosphoricons.com
+  - Multiple weights (thin, light, regular, bold, fill)
+
+### PAYMENT (Future)
+--------------------------------------------------------------------------------
+
+**Stripe Elements** (@stripe/stripe-js)
+  - Use for: Payment processing
+  - Embeddable, PCI compliant
+  - Style to match palette
+
+### UTILITY LIBRARIES
+--------------------------------------------------------------------------------
+
+**lodash-es** (if needed)
+  - Use sparingly, only import what you need
+  - Prefer native JS methods when possible
+
+**uuid**
+  - Use for: Generating client-side IDs if needed
+
+**class-variance-authority (CVA)** (RECOMMENDED)
+  - URL: https://cva.style
+  - Use for: Component variants (button sizes, colors)
+  - Pattern: const buttonVariants = cva(base, { variants: {...} })
+
+================================================================================
+## DESIGN REFERENCES - STUDY THESE CAREFULLY
+================================================================================
+
+### PRIMARY REFERENCE: PLAYTOMIC (https://playtomic.com)
+Copy these patterns exactly:
+  [x] 3-click booking flow (Search → Select → Pay)
+  [x] Calendar availability grid (green=available, gray=occupied)
+  [x] Court cards with image, sport type, price, and status badge
+  [x] Mobile-first responsive design
+  [x] Match finder with player skill level filters
+  [x] Minimal form fields (ask only what's necessary)
+
+### SECONDARY REFERENCE: AIRBNB (https://airbnb.com)
+Extract these elements:
+  [x] Search bar with filters
+  [x] Horizontal scrollable category pills
+  [x] Card-based grid layout (responsive 1-2-3-4 columns)
+  [x] Sticky filter bar on scroll
+  [x] Image carousel in listing cards
+  [x] Price display format (€XX/hora)
+  [x] Review stars and ratings system
+  [x] Wishlist heart icon
+
+### TERTIARY REFERENCE: CHESS.COM (for ELO system)
+  [x] Rating number prominently displayed
+  [x] Historical rating graph (line chart)
+  [x] Win/Loss/Draw statistics
+  [x] Rank badges and tier icons
+  [x] Progress bar to next level
+
+================================================================================
+## BACKEND DATA MODEL (ASP.NET - Source of Truth)
+================================================================================
+
+IMPORTANT: This section reflects the CURRENT backend structure.
+The UI must be flexible to accommodate future backend changes.
+If a field is added/removed in the backend, update this section accordingly.
+
+### Entity: Pista
+--------------------------------------------------------------------------------
+Fields from Domain/Entities/Pista.cs:
+  - PublicId: string (use this for URLs and APIs)
+  - Slug: string (URL-friendly name)
+  - Nombre: string
+  - Descripcion: string
+  - Imagen: string (URL)
+  - Precio: decimal (per hour)
+  - TipoPista: string (flexible - see filtering notes)
+  - Estado: string (flexible - see filtering notes)
+  - PistaDeportes: Collection (many-to-many with Deporte)
+  - IsActive: bool (for soft delete)
+  - FechaCreacion / FechaModificacion: DateTime
+
+### Entity: Deporte
+--------------------------------------------------------------------------------
+Fields from Domain/Entities/Deporte.cs:
+  - Slug: string
+  - Nombre: string
+  - Descripcion: string
+  - IsActive: bool
+  - PistaDeportes: Collection
+
+### Entity: Reserva
+--------------------------------------------------------------------------------
+Fields from Domain/Entities/Reserva.cs:
+  - PublicId: string
+  - IdUsuario: string
+  - IdPista: Guid (FK to Pista)
+  - IdClub: string (nullable)
+  - Fecha: DateTime
+  - HoraInicio: string (format "yyyy-MM-dd HH:mm:ss")
+  - HoraFin: string (format "yyyy-MM-dd HH:mm:ss")
+  - Estado: string (default "Pendiente", can be "Cancelada", etc.)
+  - PrecioTotal: decimal (calculated)
+  - TipoReserva: string
+  - IsActive: bool
+
+### Entity: Mantenimiento
+--------------------------------------------------------------------------------
+Used to block courts for maintenance periods.
+When created, overlapping Reservas are cancelled automatically.
+
+================================================================================
+## COMPONENT SPECIFICATIONS
+================================================================================
+
+### 1. NAVIGATION (Header) + THEME TOGGLE
+Reference: Craft.do floating nav + Playtomic simplicity
+
+Structure:
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │  [Logo]  │  Inicio  Pistas  Ranking  Torneos  │  [🌙] [Login] [CTA] │
+  └──────────────────────────────────────────────────────────────────────┘
+
+Specs:
+  - Position: Fixed, top center
+  - Style: Pill-shaped, subtle shadow
+  - Background: var(--bg-card) with slight opacity
+  - Border: 1px solid var(--border-color)
+  - Shadow: var(--shadow)
+  - Height: 60px
+  - Border-radius: 999px (full pill)
+  - Margin-top: 16px from viewport
+  - Theme toggle: Icon button (sun/moon)
+  - CTA Button: var(--accent-primary) background, "Reservar" text
+
+Behavior:
+  - Shrinks slightly on scroll
+  - Hides on scroll down, shows on scroll up (mobile)
+  - Active link: Underline with accent color
+
+--------------------------------------------------------------------------------
+
+### 2. SEARCH BAR (Shop Filters) - ADAPTED TO BACKEND
+Reference: Airbnb search bar
+
+Structure (based on current shop implementation):
+  ┌──────────────────────────────────────────────────────────────────────────────────────┐
+  │ [🔍 Nombre...] │ [🏸 Deporte ▼] │ [🏷️ Disponibilidad ▼] │ [↕️ Orden ▼] │ [€ ═══] │
+  │                                                                        [🔍 Buscar] │
+  └──────────────────────────────────────────────────────────────────────────────────────┘
+
+Available Filters (from Backend - PistasQueryParams):
+  - Nombre: Text input (search courts by name)
+  - Deporte: Dropdown populated from /api/deportes endpoint
+  - Disponibilidad: Dropdown (Cualquiera, Disponible, Ocupada)
+  - Orden: Dropdown (Predeterminado, Precio asc/desc, Nombre A-Z)
+  - PrecioRange: Range slider (€0 - €200, dual handles)
+
+FLEXIBILITY NOTE:
+  The backend uses flexible strings for TipoPista and Estado.
+  Current observed values:
+    - TipoPista: "cristal", "tierra", "sintetico" (from backend tests)
+    - Estado: "activa", "mantenimiento" (from backend tests)
+  
+  Recommended approach:
+    1. Fetch distinct values from API if endpoint exists
+    2. Or define constants in frontend that match backend expectations
+    3. Allow for future additions without code changes
+
+Specs:
+  - Layout: Card container, rounded-3xl, with glassmorphism effect
+  - Top row: Full-width name search input + circular search button
+  - Bottom row: Grid of filter dropdowns + price range slider
+  - Background: var(--bg-card) with backdrop-blur
+  - Border: 1px solid var(--border-color)
+  - Shadow: Large shadow for floating effect (hover:shadow-xl)
+  - Max-width: 6xl, centered
+  - Responsive: Stacked on mobile, grid on desktop
+
+Interactions:
+  - Hover: Card shadow increases
+  - Focus: Input border glow with var(--accent-primary)
+  - Dropdown: PrimeNG p-dropdown, styled to match palette
+  - Slider: PrimeNG p-slider with accent-primary range color
+  - Submit: Button with active:scale-95 micro-animation
+
+Future-proofing:
+  - If backend adds new filter fields, add them as optional grid items
+  - Use generic filter component that can render any field type
+
+--------------------------------------------------------------------------------
+
+### 3. CATEGORY PILLS (Horizontal Scroll) - SPORT SELECTOR
+Reference: Airbnb categories
+
+Structure (populated from /api/deportes):
+  ← [🎾 Tenis] [🏸 Pádel] [⚽ Fútbol] [🏀 Basket] [🏐 Voley] [...] →
+
+Data Source: GET /api/deportes
+  Each pill displays Deporte.Nombre with optional icon
+
+Specs:
+  - Layout: Horizontal scroll, hide scrollbar
+  - Pill style: Border only when inactive (var(--border-color))
+  - Active state: var(--accent-primary) bg, white text
+  - Icon + Text in each pill
+  - Gap: 12px between pills
+  - Scroll buttons: Arrows at edges (desktop only)
+
+FLEXIBILITY: Pills auto-generate from API response, no hardcoding.
+
+--------------------------------------------------------------------------------
+
+### 4. COURT CARD (Listing)
+Reference: Airbnb listing card + Playtomic court card
+
+Structure (mapped to Pista entity):
+  ┌─────────────────────────────────────┐
+  │  [Heart]              [Image 1/5]  │  ← Pista.Imagen
+  │         ← → (dots)                 │
+  ├─────────────────────────────────────┤
+  │  {Pista.Nombre}                    │
+  │  ★ 4.8 (future) · {TipoPista}     │
+  │  {Deportes[].join(', ')}           │  ← From PistaDeportes relation
+  │  ────────────────────────────       │
+  │  €{Pista.Precio}/hora        [→]  │
+  └─────────────────────────────────────┘
+
+Backend Mapping:
+  - Title: Pista.Nombre
+  - Image: Pista.Imagen
+  - Type: Pista.TipoPista
+  - Sports: Map through PistaDeportes → Deporte.Nombre
+  - Price: Pista.Precio (decimal)
+  - Status Badge: Pista.Estado
+  - Link: /reservas/{Pista.Slug}
+
+Status Badge Colors:
+  - "Disponible" / "activa": var(--accent-secondary) - green
+  - "Ocupada": var(--accent-warning) - orange
+  - "Mantenimiento": var(--text-muted) - gray
+
+Specs:
+  - Border-radius: 16px
+  - Background: var(--bg-card)
+  - Border: 1px solid var(--border-color)
+  - Image aspect ratio: 4:3 or 1:1
+  - Heart icon: Top-right, toggles wishlist (future feature)
+  - Hover: Scale(1.02), shadow increase
+  - Skeleton loading: Animated shimmer effect
+
+--------------------------------------------------------------------------------
+
+### 5. AVAILABILITY CALENDAR
+Reference: Playtomic time slot grid
+
+Data Source: GET /api/reservas?idPista={id}&fecha={date}
+  - Fetch existing reservations for the selected court and date
+  - Also check /api/mantenimientos for blocked periods
+
+Structure:
+  ┌──────┬────────┬────────┬────────┬────────┐
+  │ Hour │  Mon   │  Tue   │  Wed   │  Thu   │ ...
+  ├──────┼────────┼────────┼────────┼────────┤
+  │ 09:00│ [FREE] │ [BOOK] │ [FREE] │ [MANT] │
+  │ 10:00│ [FREE] │ [FREE] │ [MANT] │ [FREE] │
+  │ 11:00│ [BOOK] │ [FREE] │ [FREE] │ [FREE] │
+  └──────┴────────┴────────┴────────┴────────┘
+
+Specs:
+  - FREE (Available): var(--accent-secondary), clickable
+  - BOOK (Reserved): var(--text-muted), disabled, shows "Reservado"
+  - MANT (Maintenance): var(--accent-warning), disabled
+  - Selected: Accent primary border + fill
+  - Today highlight: Column with subtle glow
+  - Time slots: 1 hour intervals (configurable)
+
+Mobile:
+  - Horizontal scroll for days
+  - Sticky time column
+
+--------------------------------------------------------------------------------
+
+### 6. BOOKING FLOW (3 Steps)
+Reference: Playtomic checkout
+
+Step 1: Select Court + Time
+  - Show Pista details (Nombre, Descripcion, Imagen)
+  - Show availability grid
+  - Select date (Reserva.Fecha) and time slot (HoraInicio, HoraFin)
+  - "Continuar" button
+
+Step 2: Confirm Details
+  - Court summary card
+  - Date/time selected
+  - Price breakdown (Pista.Precio × hours = Reserva.PrecioTotal)
+  - Optional: TipoReserva selector (Individual, Club, etc.)
+  - "Confirmar" button
+
+Step 3: Confirmation
+  - Success message
+  - Booking details with PublicId
+  - "Add to Calendar" button
+  - "View My Reservations" button
+
+Backend Calls:
+  - POST /api/reservas with:
+    {
+      IdPista: "pista-public-id",
+      Fecha: "2026-02-15",
+      HoraInicio: "2026-02-15 10:00:00",
+      HoraFin: "2026-02-15 11:00:00",
+      TipoReserva: "Individual"
+    }
+
+--------------------------------------------------------------------------------
+
+### 7. ELO RATING DISPLAY (Future Feature)
+Reference: Chess.com + Faceit
+
+Structure:
+  ┌──────────────────────────────────────────┐
+  │  [Sport Icon]                            │
+  │  PÁDEL                                   │
+  │                                          │
+  │     ████████████████████░░░░░  Level 4   │
+  │                                          │
+  │            1,847                         │
+  │         ▲ +23 puntos                     │
+  │                                          │
+  │  [Graph: ELO over time]                  │
+  │                                          │
+  │  V: 34  |  D: 12  |  E: 3               │
+  └──────────────────────────────────────────┘
+
+Specs:
+  - ELO number: text-5xl, bold, var(--text-primary)
+  - Positive change: var(--accent-secondary) with up arrow
+  - Negative change: var(--accent-error) with down arrow
+  - Progress bar: Shows progress to next level
+  - Graph: Line chart (Chart.js), accent color line
+
+Tiers (suggested):
+  - Bronze: 0-1000
+  - Silver: 1000-1500
+  - Gold: 1500-2000
+  - Platinum: 2000-2500
+  - Diamond: 2500-3000
+  - Master: 3000+
+
+--------------------------------------------------------------------------------
+
+### 8. ADMIN DASHBOARD
+Reference: Vercel dashboard + Linear
+
+Layout:
+  ┌─────┬────────────────────────────────────────┐
+  │     │  [Breadcrumb]         [Theme] [👤]    │
+  │ S   ├────────────────────────────────────────┤
+  │ I   │                                        │
+  │ D   │  ┌─────────┐ ┌─────────┐ ┌─────────┐  │
+  │ E   │  │ Stat 1  │ │ Stat 2  │ │ Stat 3  │  │
+  │ B   │  └─────────┘ └─────────┘ └─────────┘  │
+  │ A   │                                        │
+  │ R   │  ┌────────────────────────────────┐   │
+  │     │  │ Table / List / Content        │   │
+  │     │  │                                │   │
+  │     │  └────────────────────────────────┘   │
+  └─────┴────────────────────────────────────────┘
+
+Sidebar Items (matching backend controllers):
+  - Dashboard (overview)
+  - Pistas (CRUD - PistasController)
+  - Reservas (CRUD - ReservasController)
+  - Deportes (CRUD - DeportesController)
+  - Mantenimientos (CRUD - MantenimientosController)
+  - Usuarios (future)
+  - Torneos (future)
+  - Configuración
+
+================================================================================
+## MICRO-INTERACTIONS & ANIMATIONS
+================================================================================
+
+### Loading States
+- Skeleton screens (shimmer effect) instead of spinners
+- Button loading: Spinner replaces text, disable click
+- Page transitions: Fade in (200ms)
+
+### Hover Effects
+- Cards: Scale(1.02), shadow increase
+- Buttons: Background opacity change (10%)
+- Links: Underline animates in from left
+- Icons: Slight rotation or bounce
+
+### Success States
+- Check mark animation (SVG animated)
+- Toast notifications slide in from top-right
+
+### Transitions
+- All transitions: 200ms ease-out
+- Modal: Fade in + scale from 0.95 to 1
+- Dropdown: Slide down + fade
+- Page changes: Fade between routes
+- Theme switch: 300ms color transition
+
+================================================================================
+## RESPONSIVE BREAKPOINTS
+================================================================================
+
+Mobile First Approach:
+
+--mobile: 0px - 639px
+  - Single column layouts
+  - Stacked navigation (hamburger menu)
+  - Full-width cards
+  - Bottom sheet modals
+  - Theme toggle in hamburger menu
+
+--tablet: 640px - 1023px
+  - 2 column grids
+  - Sidebar collapses to icons
+  - Compact cards
+
+--desktop: 1024px - 1279px
+  - 3 column grids
+  - Full sidebar
+  - Floating search bar
+
+--large: 1280px+
+  - 4 column grids
+  - Max-width containers (1400px)
+  - More whitespace
+
+================================================================================
+## ACCESSIBILITY REQUIREMENTS
+================================================================================
+
+MUST PASS:
+  [x] All AXE checks
+  [x] WCAG AA color contrast (4.5:1 text, 3:1 UI) - for BOTH themes
+  [x] Keyboard navigation (Tab, Enter, Escape)
+  [x] Focus visible states (accent color outline)
+  [x] ARIA labels on interactive elements
+  [x] Alt text on all images
+  [x] Screen reader compatible
+  [x] Respect prefers-reduced-motion
+  [x] Respect prefers-color-scheme for default theme
+
+Focus State:
+  - Outline: 2px solid var(--accent-primary)
+  - Outline-offset: 2px
+  - Box-shadow: 0 0 0 4px var(--accent-primary / 0.3)
+
+================================================================================
+## BACKEND FLEXIBILITY GUIDELINES
+================================================================================
+
+The backend (ASP.NET) is still in development. Follow these rules:
+
+1. NEVER HARDCODE ENUM VALUES
+   - TipoPista, Estado, TipoReserva are strings
+   - Fetch valid values from API or use constants file
+   - Create a centralized constants.ts that can be updated
+
+2. USE publicId FOR ALL USER-FACING URLS
+   - Backend uses internal Guid Id for database
+   - PublicId and Slug are for URLs and external references
+
+3. HANDLE SOFT DELETES
+   - Check IsActive field before displaying entities
+   - Filter out IsActive=false in API queries
+
+4. DATE/TIME HANDLING
+   - HoraInicio/HoraFin use format: "yyyy-MM-dd HH:mm:ss"
+   - Fecha is a Date field
+   - Display in user's locale, send in ISO format
+
+5. PRICE CALCULATION
+   - PrecioTotal = Pista.Precio × duration in hours
+   - Backend calculates this, but UI should show preview
+
+6. EXTENSIBILITY
+   - If new fields appear in API responses, ignore gracefully
+   - If required fields are missing, show sensible defaults
+   - Log unexpected API changes for debugging
+
+================================================================================
+## IMPLEMENTATION PRIORITIES
+================================================================================
+
+### Phase 1 - Core Experience
+1. Theme toggle (light/dark mode)
+2. Header with glassmorphism
+3. Home page hero + search (with backend filters)
+4. Court listing grid (from /api/pistas)
+5. Court detail page with availability calendar
+6. Basic booking flow (POST /api/reservas)
+
+### Phase 2 - User Features
+7. Authentication (login/register)
+8. User profile page
+9. My Reservations list
+10. Sport category filtering
+
+### Phase 3 - Admin
+11. Dashboard layout
+12. Pistas CRUD
+13. Reservas management
+14. Deportes CRUD
+15. Mantenimientos management
+
+### Phase 4 - Advanced
+16. ELO system
+17. Tournaments
+18. Club management
+19. Real-time notifications
+
+================================================================================
+## QUALITY CHECKLIST
+================================================================================
+
+Before marking any component as "done":
+
+  [ ] Works in BOTH light and dark mode
+  [ ] Theme toggle functions correctly
+  [ ] Responsive on all breakpoints
+  [ ] Hover/focus states working
+  [ ] Loading skeleton implemented
+  [ ] Error states handled
+  [ ] Empty states designed
+  [ ] Accessibility tested (keyboard + screen reader)
+  [ ] Animations smooth (60fps)
+  [ ] No console errors
+  [ ] PrimeNG components styled to match theme
+  [ ] Backend API integration tested
+
+================================================================================
+## FINAL NOTES FOR AGENTS
+================================================================================
+
+1. DO NOT use default PrimeNG styling. Override everything to match this spec.
+
+2. DO NOT hardcode colors. Use CSS variables for EVERYTHING.
+
+3. DO NOT skip the theme toggle. Both modes are required.
+
+4. DO NOT hardcode backend enum values. Keep them flexible.
+
+5. DO prefer CSS variables over hardcoded values.
+
+6. DO use semantic HTML (header, nav, main, section, article, footer).
+
+7. DO implement smooth transitions on all interactive elements.
+
+8. DO make it PREMIUM. If something looks "basic" or "MVP-ish", it's wrong.
+
+9. DO check that colors meet contrast requirements in BOTH themes.
+
+10. DO keep this document updated if backend changes.
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================

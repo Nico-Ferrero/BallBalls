@@ -1,0 +1,55 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-8 pb-12">
+    <!-- Profile Info Card -->
+    <div
+        class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 bg-[var(--bg-card)] p-6 rounded-3xl shadow-md border border-[var(--border-color)] transition-all">
+        @if (isLoading()) {
+        <p-skeleton shape="circle" size="8rem"></p-skeleton>
+        <div class="flex flex-col gap-3 w-full sm:w-1/2">
+            <p-skeleton width="70%" height="2.5rem"></p-skeleton>
+            <p-skeleton width="40%" height="1.5rem"></p-skeleton>
+        </div>
+        } @else if (profile()) {
+        <div class="relative shrink-0">
+            @if (profile()?.fotoPerfil) {
+            <img [src]="profile()?.fotoPerfil" alt="Foto Perfil"
+                class="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-[var(--bg-card)] shadow-xl object-cover bg-[var(--bg-body)]" />
+            } @else {
+            <div
+                class="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-[var(--bg-card)] shadow-xl bg-[var(--accent-primary)] flex items-center justify-center text-5xl md:text-6xl font-bold text-white">
+                {{ profile()?.username?.charAt(0)?.toUpperCase() || 'U' }}
+            </div>
+            }
+            @if (isCurrentUser()) {
+            <button
+                class="absolute bottom-2 right-2 bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--accent-primary)] p-3 rounded-full shadow-lg transition-transform transform hover:-translate-y-1 border border-[var(--border-color)]">
+                <i class="pi pi-camera"></i>
+            </button>
+            }
+        </div>
+
+        <div class="flex-1 text-center sm:text-left pt-2">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">{{
+                profile()?.nombre || profile()?.username }}</h1>
+            <p class="text-lg text-[var(--text-secondary)] font-medium mt-1">&#64;{{ profile()?.username }}</p>
+
+            <div
+                class="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-6 text-sm text-[var(--text-muted)]">
+                <span
+                    class="flex items-center gap-1.5 bg-[var(--bg-tertiary)] px-4 py-1.5 rounded-full border border-[var(--border-color)] shadow-sm font-medium">
+                    <i class="pi pi-calendar text-[var(--accent-secondary)]"></i> Miembro desde {{
+                    profile()?.fechaRegistro | date:'mediumDate' }}
+                </span>
+                @for (role of profile()?.roles; track role) {
+                <span
+                    class="flex items-center gap-1.5 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-4 py-1.5 rounded-full font-bold border border-[var(--accent-primary)]/20 shadow-sm">
+                    <i class="pi pi-verified"></i> {{ role }}
+                </span>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Child components are projected here -->
+    <ng-content></ng-content>
+</div>

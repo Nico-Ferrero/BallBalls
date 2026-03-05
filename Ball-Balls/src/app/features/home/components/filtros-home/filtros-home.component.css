@@ -1,0 +1,63 @@
+:host {
+  display: contents;
+}
+
+/* Base Overrides for Layout/transparency ONLY */
+:host ::ng-deep .p-calendar,
+:host ::ng-deep .p-dropdown {
+  width: 100%;
+}
+
+/* Make inputs transparent to fit the Search Bar container */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: var(--text-secondary);
+}
+
+:host ::ng-deep .p-inputtext:focus {
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-inputtext::placeholder {
+  color: var(--text-muted);
+}
+
+/* Dropdown specific layout */
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+  padding: 0;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-trigger {
+  width: 1.5rem;
+  color: var(--text-muted);
+}
+
+/* Overlays (Datepicker & Dropdown Panel) */
+:host ::ng-deep .p-datepicker,
+:host ::ng-deep .p-dropdown-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+
+/* Calendar table spacing (Layout) */
+:host ::ng-deep .p-datepicker table td {
+  padding: 0.25rem;
+}
+
+:host ::ng-deep .p-datepicker table td>span {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+}
+
+:host ::ng-deep .p-datepicker .p-datepicker-header {
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem;
+}
