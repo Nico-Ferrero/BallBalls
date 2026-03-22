@@ -3,8 +3,8 @@ export interface Deporte {
     nombre: string;
     descripcion: string | null;
     isActive: boolean;
-    fechaCreacion: string;      // Formato ISO8601
-    fechaActualizacion: string; // Formato ISO8601
+    fechaCreacion: string;     // Formato ISO8601
+    fechaModificacion: string; // Formato ISO8601
 }
 
 export interface DeportesResponse {

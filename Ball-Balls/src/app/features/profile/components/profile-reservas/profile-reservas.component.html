@@ -1,0 +1,58 @@
+<div class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-8 shadow-md">
+    <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 rounded-full bg-[var(--accent-primary)]/10 flex items-center justify-center text-[var(--accent-primary)] text-xl">
+            <i class="pi pi-calendar"></i>
+        </div>
+        <div>
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Mis Reservas</h2>
+            <p class="text-[var(--text-secondary)] mt-1">Historial de pistas reservadas</p>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+        <div class="flex justify-center p-8">
+            <i class="pi pi-spin pi-spinner text-3xl text-[var(--accent-primary)]"></i>
+        </div>
+    } @else if (error()) {
+        <div class="p-4 bg-[var(--accent-error)]/10 text-[var(--accent-error)] rounded-xl border border-[var(--accent-error)]/20">
+            {{ error() }}
+        </div>
+    } @else {
+        @if (reservas().length === 0) {
+            <div class="text-center p-8 text-[var(--text-secondary)]">
+                <i class="pi pi-inbox text-4xl mb-3 opacity-50"></i>
+                <p>No tienes reservas registradas.</p>
+            </div>
+        } @else {
+            <div class="grid gap-4 mt-4">
+                @for (reserva of reservas(); track reserva.publicId) {
+                    <div class="flex flex-col sm:flex-row justify-between items-center bg-[var(--bg-body)] p-5 rounded-2xl border border-[var(--border-color)] shadow-sm hover:shadow-md transition-all">
+                        <div class="flex flex-col mb-3 sm:mb-0">
+                            <!-- Fecha y Hora -->
+                            <span class="text-sm text-[var(--text-secondary)] font-medium">
+                                {{ reserva.fechaHoraInicio | date:'dd MMM yyyy, HH:mm' }} - 
+                                {{ reserva.fechaHoraFin | date:'HH:mm' }}
+                            </span>
+                            <!-- Pista o Actividad -->
+                            <span class="text-lg font-bold text-[var(--text-primary)] mt-1">
+                                Pista ID: {{ reserva.pista || 'No identificada' }}
+                            </span>
+                            <!-- Estado (Pending, Paid, Cancelled) -->
+                            <span class="mt-2 inline-flex items-center max-w-max px-2.5 py-1 rounded-full text-xs font-semibold
+                                {{ reserva.estado?.toLowerCase() === 'paid' ? 'bg-green-100 text-green-800' :
+                                   reserva.estado?.toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                   'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]' }}">
+                                {{ reserva.estado | uppercase }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-xl font-bold text-[var(--accent-primary)]">{{ reserva.precioTotal | currency:'EUR':'symbol':'1.2-2' }}</span>
+                            <span class="text-xs text-[var(--text-muted)]">Ref: {{ reserva.publicId?.substring(0,8) }}</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

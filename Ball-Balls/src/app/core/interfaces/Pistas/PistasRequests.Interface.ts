@@ -21,6 +21,10 @@ export interface CreatePistaRequest {
     isActive: boolean;
 }
 
+export interface CreatePistaRequestEnvelope {
+    body: CreatePistaRequest;
+}
+
 export interface UpdatePistaRequest {
     slug: string;
     nombre: string;
@@ -33,7 +37,15 @@ export interface UpdatePistaRequest {
     isActive: boolean;
 }
 
+export interface UpdatePistaRequestEnvelope {
+    body: UpdatePistaRequest;
+}
+
 export interface SoftDeletePistaRequest {
     slug: string;
     isActive: boolean;
+}
+
+export interface SoftDeletePistaRequestEnvelope {
+    body: SoftDeletePistaRequest;
 }

@@ -1,14 +1,14 @@
 export interface LoginRequest {
-    email: string;
-    password?: string;
-    deviceId?: string;
+    email: string | null;
+    password?: string | null;
+    deviceId?: string | null;
 }
 
 export interface RegisterRequest {
-    username: string;
-    nombre: string;
-    email: string;
-    password?: string;
+    username: string | null;
+    nombre: string | null;
+    email: string | null;
+    password?: string | null;
 }
 
 export interface LogoutRequest {

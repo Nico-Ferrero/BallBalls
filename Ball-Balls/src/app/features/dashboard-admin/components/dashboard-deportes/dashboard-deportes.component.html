@@ -1,0 +1,87 @@
+<section class="dashboard-module">
+  <header class="dashboard-module__header">
+    <h2>Deportes</h2>
+    <div class="dashboard-module__actions">
+      <span *ngIf="deportesData() as data">Total: {{ data.total }}</span>
+      <button pButton type="button" label="Nuevo" icon="pi pi-plus" (click)="openCreateDialog()"></button>
+    </div>
+  </header>
+
+  <div class="dashboard-module__crud">
+    <button pButton type="button" label="Crear" icon="pi pi-plus" (click)="openCreateDialog()"></button>
+    <button pButton type="button" label="Actualizar" icon="pi pi-refresh" (click)="quickUpdate()"></button>
+    <button pButton type="button" label="Desactivar" icon="pi pi-eye-slash" severity="danger" (click)="quickDeactivate()"></button>
+  </div>
+
+  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando deportes...</p>
+  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+
+  <p-table
+    *ngIf="deportesData() as data"
+    [value]="data.items"
+    [paginator]="true"
+    [rows]="8"
+    responsiveLayout="scroll"
+    styleClass="dashboard-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre</th>
+        <th>Descripcion</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-deporte>
+      <tr>
+        <td>{{ deporte.nombre || '-' }}</td>
+        <td>{{ deporte.descripcion || 'Sin descripcion' }}</td>
+        <td>
+          <span class="status" [class.inactive]="!deporte.isActive">{{ deporte.isActive ? 'Activo' : 'Inactivo' }}</span>
+        </td>
+        <td class="actions-cell">
+          <button pButton type="button" icon="pi pi-pencil" class="p-button-text" (click)="openEditDialog(deporte)"></button>
+          <button
+            pButton
+            type="button"
+            [icon]="deporte.isActive ? 'pi pi-eye-slash' : 'pi pi-eye'"
+            class="p-button-text"
+            (click)="toggleActive(deporte)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '32rem' }"
+    [header]="editingSlug ? 'Editar Deporte' : 'Nuevo Deporte'"
+    (onHide)="closeDialog()"
+  >
+    <form [formGroup]="form" class="deporte-form" (ngSubmit)="save()">
+      <label for="nombre">Nombre</label>
+      <input
+        id="nombre"
+        type="text"
+        pInputText
+        formControlName="nombre"
+        [class.field-invalid]="formSubmitted && nombreControl.invalid"
+      />
+      <small *ngIf="formSubmitted && nombreControl.hasError('required')" class="field-error">El nombre es obligatorio.</small>
+      <small *ngIf="formSubmitted && nombreControl.hasError('maxlength')" class="field-error">Maximo 100 caracteres.</small>
+
+      <label for="descripcion">Descripcion</label>
+      <textarea id="descripcion" rows="4" pInputTextarea formControlName="descripcion"></textarea>
+
+      <div class="deporte-form__actions">
+        <button pButton type="button" label="Cancelar" class="p-button-text" (click)="closeDialog()"></button>
+        <button pButton type="submit" label="Guardar"></button>
+      </div>
+    </form>
+  </p-dialog>
+</section>

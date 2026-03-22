@@ -1,11 +1,14 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { noAuthGuard } from './core/guards/no-auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 import { provideState } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { profileReducer } from './features/profile/store/reducers';
 import { ProfileEffects } from './features/profile/store/effects';
+import { dashboardAdminReducer } from './features/dashboard-admin/store/reducers';
+import { DashboardAdminEffects } from './features/dashboard-admin/store/effects';
 
 export const routes: Routes = [
     {
@@ -17,6 +20,11 @@ export const routes: Routes = [
         path: 'pistas',
         loadComponent: () => import('./features/shop/shop.component').then(m => m.ShopComponent),
         title: 'Pistas - Ball&Balls'
+    },
+    {
+        path: 'reservas/:slug',
+        loadComponent: () => import('./features/article/article.component').then(m => m.ArticleComponent),
+        title: 'Reserva - Ball&Balls'
     },
     {
         path: 'ranking',
@@ -41,6 +49,17 @@ export const routes: Routes = [
             provideEffects([ProfileEffects])
         ],
         loadChildren: () => import('./features/profile/profile.routes').then(m => m.profileRoutes)
+    },
+    {
+        path: 'dashboard-admin',
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Admin'] },
+        providers: [
+            provideState('dashboardAdmin', dashboardAdminReducer),
+            provideEffects([DashboardAdminEffects])
+        ],
+        loadChildren: () => import('./features/dashboard-admin/dashboard-admin.routes').then(m => m.dashboardAdminRoutes),
+        title: 'Dashboard Admin - Ball&Balls'
     },
     {
         path: '**',

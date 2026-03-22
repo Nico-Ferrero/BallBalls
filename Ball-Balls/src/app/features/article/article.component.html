@@ -1,0 +1,246 @@
+<div class="article-container">
+    <!-- Navbar: Botón para volver atrás -->
+    <nav class="article-nav">
+        <a routerLink="/pistas" class="back-button" aria-label="Volver a pistas">
+            <lucide-icon [name]="ArrowLeft" [size]="20"></lucide-icon>
+            <span>Volver a las pistas</span>
+        </a>
+    </nav>
+
+    <!-- Estado de carga -->
+    @if (isLoading) {
+    <div class="skeleton-layout">
+        <div class="skeleton-content">
+            <p-skeleton width="100%" height="400px" borderRadius="16px"></p-skeleton>
+            <div class="skeleton-details">
+                <p-skeleton width="60%" height="2rem" styleClass="mb-2"></p-skeleton>
+                <p-skeleton width="40%" height="1.5rem" styleClass="mb-4"></p-skeleton>
+                <p-skeleton width="100%" height="1rem" styleClass="mb-2"></p-skeleton>
+                <p-skeleton width="90%" height="1rem" styleClass="mb-2"></p-skeleton>
+                <p-skeleton width="80%" height="1rem"></p-skeleton>
+            </div>
+        </div>
+        <div class="skeleton-sidebar">
+            <p-skeleton width="100%" height="300px" borderRadius="16px"></p-skeleton>
+        </div>
+    </div>
+    } @else if (error) {
+    <!-- Estado de error -->
+    <div class="state-message error-message" role="alert">
+        <div class="error-icon"></div>
+        <h2>Lo sentimos</h2>
+        <p>{{ error }}</p>
+        <p-button label="Volver al inicio" icon="pi pi-home" routerLink="/pistas"></p-button>
+    </div>
+    } @else if (pista) {
+    <!-- Visualización de los detalles de la pista -->
+    <main class="article-grid">
+        
+        <!-- Columna Izquierda: Información de la pista -->
+        <section class="pista-details">
+            <!-- Imagen destacada -->
+            <div class="pista-image-wrapper">
+                <img 
+                    [src]="pista.imagen || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&q=80&w=1200'"
+                    [alt]="'Imagen de ' + pista.nombre" 
+                    class="pista-hero-image" 
+                />
+                
+                <div class="image-overlay"></div>
+                
+                <!-- Chips sobre la imagen -->
+                <div class="pista-badges">
+                    <p-chip [label]="getStatusLabel(pista.estado)" styleClass="status-chip {{ getStatusSeverity(pista.estado) }}"></p-chip>
+                    
+                    @if (pista.tipoPista) {
+                    <p-chip styleClass="type-chip">
+                        <ng-template pTemplate="content">
+                            <lucide-icon [name]="Activity" [size]="14"></lucide-icon>
+                            <span class="ml-2">{{ pista.tipoPista }}</span>
+                        </ng-template>
+                    </p-chip>
+                    }
+                </div>
+            </div>
+
+            <!-- Cabecera de la pista -->
+            <header class="pista-header">
+                <div>
+                    <h1 class="pista-title">{{ pista.nombre }}</h1>
+                    <div class="pista-meta">
+                        <span class="rating">
+                            <lucide-icon [name]="Star" [size]="16" class="star-icon"></lucide-icon>
+                            4.8 <span class="text-muted">(124 valoraciones)</span>
+                        </span>
+                        <span class="location">
+                            <lucide-icon [name]="MapPin" [size]="16"></lucide-icon>
+                            Complejo Deportivo Principal
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <p-divider></p-divider>
+
+            <!-- Deportes suportados (Amenities equivalentes) -->
+            @if (pista.deportes && pista.deportes.length > 0) {
+            <section class="pista-section">
+                <h2>Deportes admitidos</h2>
+                <div class="sports-grid">
+                    @for (deporte of pista.deportes; track deporte) {
+                    <div class="sport-item">
+                        <lucide-icon [name]="CheckCircle2" [size]="20" class="text-primary"></lucide-icon>
+                        <span>{{ deporte }}</span>
+                    </div>
+                    }
+                </div>
+            </section>
+            <p-divider></p-divider>
+            }
+
+            <!-- Acerca de la pista -->
+            <section class="pista-section">
+                <h2>Acerca de esta pista</h2>
+                <p class="description-text">
+                    {{ pista.descripcion || 'No hay descripción disponible para esta pista. Disfruta de instalaciones de primera calidad ideales para tus partidos y entrenamientos.' }}
+                </p>
+            </section>
+
+        </section>
+
+        <!-- Columna Derecha: Panel de Reserva -->
+        <aside class="booking-sidebar">
+            <div class="booking-card glass-panel">
+                <div class="booking-header">
+                    <div class="price-display">
+                        <span class="price-value">{{ pista.precio | currency:'EUR' }}</span>
+                        <span class="price-period">/ hora</span>
+                    </div>
+                </div>
+
+                <div class="booking-form mt-4">
+                    <!-- Botón para abrir el nuevo modal interactivo -->
+                    <p-button 
+                        label="Reservar Pista" 
+                        icon="pi pi-calendar-plus" 
+                        styleClass="p-button-primary w-full p-button-lg shadow-xl"
+                        [disabled]="pista.estado?.toLowerCase() === 'ocupada' || pista.estado?.toLowerCase() === 'mantenimiento'"
+                        (onClick)="abrirDialogoReserva()"
+                    ></p-button>
+
+                    <div class="guarantee-badge mt-3 text-center text-sm text-muted">
+                        <lucide-icon [name]="ShieldCheck" [size]="14" class="mr-1"></lucide-icon>
+                        Revisión de horarios y pago
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Modal Dialog PrimeNG (Rediseño Palette Web + Multiple Slots) -->
+    <p-dialog 
+        header="Reserva tu pista" 
+        [modal]="true" 
+        [(visible)]="mostrarDialogoReserva"
+        [style]="{ width: '80vw' }"
+        styleClass="booking-modal-light"
+        (onHide)="cerrarModal()"
+        [dismissableMask]="true">
+        
+        @if (!mostrandoPago) {
+            <p class="modal-subtitle mb-4 text-muted">
+                Selecciona fecha y uno o múltiples slots correlativos de 1 hora (09:00 - 21:00).
+            </p>
+
+            @if (isLoadingSlots) {
+                <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" class="mb-4 block"></p-progressBar>
+            }
+
+            <div class="booking-modal-grid">
+                <!-- Izquierda: Calendario -->
+                <div class="booking-modal-left">
+                    <div class="modal-section-title">FECHA</div>
+                    <div class="calendar-wrapper shadow-2 border-round">
+                        <p-calendar 
+                            [(ngModel)]="fechaSeleccionada" 
+                            [minDate]="hoy" 
+                            [inline]="true"
+                            (onSelect)="buscarReservasPorFecha()"
+                        ></p-calendar>
+                    </div>
+                </div>
+
+                <!-- Derecha: Grid de horarios -->
+                <div class="booking-modal-right">
+                    <div class="flex justify-content-between align-items-center mb-3">
+                        <div class="modal-section-title mb-0">HORARIOS DISPONIBLES</div>
+                        <div class="legend">
+                            <span class="legend-item libre">Libre</span>
+                            <span class="legend-item ocupado">Ocupado</span>
+                            <span class="legend-item seleccionado">Seleccionado</span>
+                        </div>
+                    </div>
+
+                    <div class="time-slots-grid">
+                        @for (slot of slotsDisponibles; track slot.inicio) {
+                            <button 
+                                class="time-slot-btn" 
+                                [class.ocupado]="slot.disabled"
+                                [class.selected]="isSlotSeleccionado(slot)"
+                                [disabled]="slot.disabled || isLoadingSlots"
+                                (click)="seleccionarSlot(slot)"
+                                type="button">
+                                {{ slot.label }}
+                            </button>
+                        }
+                    </div>
+
+                    <div class="booking-modal-summary surface-ground p-3 border-round border-1 surface-border">
+                        <div class="font-bold text-lg">Pista: {{ pista?.nombre }}</div>
+                        <div class="precio-texto mt-2">
+                            Precio total: <span class="font-bold text-primary text-xl">{{ precioTotal | currency:'EUR' }}</span>
+                            <span class="text-sm text-color-secondary ml-2">({{ slotsSeleccionados.length }} hora/s)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="booking-modal-footer flex justify-content-end gap-3 mt-5">
+                <p-button label="Cancelar" styleClass="p-button-text p-button-secondary" (onClick)="cerrarModal()"></p-button>
+                <p-button label="Continuar al pago" styleClass="p-button-primary px-4 font-bold" [disabled]="slotsSeleccionados.length === 0" (onClick)="confirmarReserva()" [loading]="isSubmittingReserva"></p-button>
+            </div>
+        } @else {
+            <div class="payment-modal-container p-3">
+                <p class="modal-subtitle mb-4 text-muted text-center">
+                    Ingresa los datos de tu tarjeta para asegurar la reserva y evitar cancelaciones.
+                </p>
+                
+                <div class="mb-4">
+                    <div class="booking-modal-summary surface-ground p-3 border-round border-1 surface-border text-center flex flex-column gap-2 align-items-center">
+                        <div class="font-bold text-lg text-center">{{ pista?.nombre }}</div>
+                        <div class="flex align-items-center gap-2">
+                           <lucide-icon [name]="Calendar" [size]="18" class="text-primary"></lucide-icon>
+                           <span>{{ fechaSeleccionada | date:'shortDate' }}</span>
+                           <span class="text-color-secondary">({{ slotsSeleccionados[0].inicio }} - {{ slotsSeleccionados[slotsSeleccionados.length - 1].fin }})</span>
+                        </div>
+                        <div class="text-center mt-2 border-top-1 surface-border w-full pt-2">
+                           Total a pagar: <span class="font-bold text-primary text-2xl">{{ precioTotal | currency:'EUR' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stripe Elements Container -->
+                <div id="payment-element" class="mb-4 border-round"></div>
+                
+                <div class="flex justify-content-center gap-3 mt-4 border-top-1 surface-border pt-4">
+                     <p-button label="Corregir horario" styleClass="p-button-text p-button-secondary" (onClick)="mostrandoPago = false" [disabled]="isProcessingPayment"></p-button>
+                     <p-button label="Confirmar y Pagar" styleClass="p-button-success px-5 font-bold p-button-lg shadow-2" icon="pi pi-check" (onClick)="pagarReserva()" [loading]="isProcessingPayment"></p-button>
+                </div>
+            </div>
+        }
+    </p-dialog>
+
+    }
+</div>

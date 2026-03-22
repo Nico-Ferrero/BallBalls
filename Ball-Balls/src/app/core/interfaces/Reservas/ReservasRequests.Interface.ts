@@ -1,21 +1,26 @@
 // Request interfaces para Reservas API
 
 export interface CreateReservaRequest {
-    pista: string;
-    fecha: string;
-    horaInicio: string;
-    horaFin: string;
-    estado: string;
-    tipo: string;
+    pista: string | null;
+    fecha: string | null;
+    horaInicio: string | null;
+    horaFin: string | null;
+    estado: string | null;
+    tipo: string | null;
     club: string | null;
 }
 
 export interface UpdateReservaRequest {
-    pista: string;
-    fecha: string;
-    horaInicio: string;
-    horaFin: string;
-    estado: string;
-    tipo: string;
+    pista: string | null;
+    fecha: string | null;
+    horaInicio: string | null;
+    horaFin: string | null;
+    estado: string | null;
+    tipo: string | null;
     club: string | null;
+}
+
+export interface PaymentIntentResponse {
+    clientSecret: string;
+    reservaId: string;
 }

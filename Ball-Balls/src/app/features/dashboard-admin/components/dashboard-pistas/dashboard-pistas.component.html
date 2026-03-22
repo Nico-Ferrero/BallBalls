@@ -1,0 +1,180 @@
+<section class="dashboard-module">
+  <header class="dashboard-module__header">
+    <div>
+      <h2>Pistas</h2>
+      <p class="dashboard-module__subtitle">Gestion de pistas deportivas disponibles</p>
+    </div>
+
+    <div class="dashboard-module__actions">
+      <span *ngIf="pistasData() as data">Total: {{ data.total }}</span>
+      <button pButton type="button" label="Nueva" icon="pi pi-plus" (click)="openCreateDialog()"></button>
+      <button pButton type="button" label="Recargar" icon="pi pi-refresh" severity="secondary" (click)="reload()"></button>
+    </div>
+  </header>
+
+  <form [formGroup]="filterForm" class="filters" (ngSubmit)="applyFilters()">
+    <div class="filters__card">
+      <div class="filters__field">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" pInputText formControlName="Nombre" placeholder="Buscar pista..." />
+      </div>
+
+      <div class="filters__field">
+        <label for="deporte">Deporte</label>
+        <p-dropdown
+          id="deporte"
+          [options]="deportesFilterOptions"
+          formControlName="Deporte"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          placeholder="Seleccionar deporte"
+        ></p-dropdown>
+      </div>
+
+      <div class="filters__field">
+        <label for="disponibilidad">Fecha</label>
+        <p-calendar
+          id="disponibilidad"
+          formControlName="Disponibilidad"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          [showClear]="true"
+          appendTo="body"
+          placeholder="Seleccionar fecha"
+        ></p-calendar>
+      </div>
+
+      <div class="filters__field filters__field--inline">
+        <label for="precio-min">Precio</label>
+        <div class="filters__price-row">
+          <input id="precio-min" pInputText type="number" formControlName="PrecioMin" placeholder="Min" />
+          <input pInputText type="number" formControlName="PrecioMax" placeholder="Max" />
+        </div>
+      </div>
+
+      <div class="filters__actions">
+        <button pButton type="submit" label="Filtrar" icon="pi pi-filter"></button>
+        <button pButton type="button" label="Limpiar" icon="pi pi-trash" severity="secondary" (click)="clearFilters()"></button>
+      </div>
+    </div>
+  </form>
+
+  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando pistas...</p>
+  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+
+  <div *ngIf="!isLoading() && pistasData() as data" class="cards-grid">
+    <article class="pista-card" *ngFor="let pista of data.items">
+      <div class="pista-card__media">
+        <img [src]="pista.imagen || 'assets/images/pista-placeholder.jpg'" [alt]="pista.nombre || 'Pista'" />
+        <span class="pista-card__badge" [class.is-inactive]="!pista.isActive">{{ pista.isActive ? 'Activa' : 'Inactiva' }}</span>
+      </div>
+
+      <div class="pista-card__content">
+        <h3>{{ pista.nombre || '-' }}</h3>
+        <p>{{ pista.descripcion || 'Sin descripcion' }}</p>
+
+        <div class="pista-card__meta">
+          <span>{{ pista.tipoPista || '-' }}</span>
+          <strong>{{ pista.precio | currency: 'EUR' }}</strong>
+        </div>
+
+        <p class="pista-card__sports">{{ formatDeportes(pista) }}</p>
+
+        <div class="pista-card__actions">
+          <button pButton type="button" icon="pi pi-pencil" label="Editar" severity="secondary" (click)="openEditDialog(pista)"></button>
+          <button
+            pButton
+            type="button"
+            [icon]="pista.isActive ? 'pi pi-eye-slash' : 'pi pi-eye'"
+            [label]="pista.isActive ? 'Desactivar' : 'Activar'"
+            severity="danger"
+            (click)="toggleActive(pista)"
+          ></button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div *ngIf="!isLoading() && pistasData() && totalPages > 1" class="pagination">
+    <button pButton type="button" label="Anterior" severity="secondary" [disabled]="pageNumber === 1" (click)="changePage(pageNumber - 1)"></button>
+    <span>Pagina {{ pageNumber }} de {{ totalPages }}</span>
+    <button pButton type="button" label="Siguiente" severity="secondary" [disabled]="pageNumber === totalPages" (click)="changePage(pageNumber + 1)"></button>
+  </div>
+
+  <p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '36rem' }"
+    [header]="editingSlug ? 'Editar Pista' : 'Nueva Pista'"
+    (onHide)="closeDialog()"
+  >
+    <form [formGroup]="form" class="pista-form" (ngSubmit)="save()">
+      <label for="nombre-form">Nombre</label>
+      <input id="nombre-form" type="text" pInputText formControlName="nombre" [class.field-invalid]="formSubmitted && nombreControl.invalid" />
+      <small *ngIf="formSubmitted && nombreControl.hasError('required')" class="field-error">El nombre es obligatorio.</small>
+
+      <label for="precio-form">Precio</label>
+      <input id="precio-form" type="number" pInputText formControlName="precio" [class.field-invalid]="formSubmitted && precioControl.invalid" />
+      <small *ngIf="formSubmitted && precioControl.hasError('min')" class="field-error">El precio no puede ser negativo.</small>
+
+      <label for="descripcion-form">Descripcion</label>
+      <textarea id="descripcion-form" rows="3" pInputTextarea formControlName="descripcion"></textarea>
+
+      <label for="imagen-form">Imagen (URL)</label>
+      <input id="imagen-form" type="text" pInputText formControlName="imagen" />
+
+      <label for="deportes-form">Deportes</label>
+      <p-multiSelect
+        id="deportes-form"
+        [options]="deportesOptions"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        [display]="'chip'"
+        defaultLabel="Selecciona deportes"
+        formControlName="deportes"
+      ></p-multiSelect>
+      <small *ngIf="formSubmitted && deportesControl.invalid" class="field-error">Selecciona al menos un deporte.</small>
+
+      <label for="idTipoPista">Id Tipo Pista</label>
+      <p-dropdown
+        id="idTipoPista"
+        [options]="tipoPistaOptions"
+        optionLabel="label"
+        optionValue="value"
+        [editable]="true"
+        [showClear]="true"
+        placeholder="Selecciona o escribe"
+        formControlName="idTipoPista"
+        (onChange)="onTipoChange($event.value)"
+      ></p-dropdown>
+      <small *ngIf="formSubmitted && idTipoPistaControl.invalid" class="field-error">El tipo de pista es obligatorio.</small>
+
+      <label for="idEstado">Id Estado</label>
+      <p-dropdown
+        id="idEstado"
+        [options]="estadoOptions"
+        optionLabel="label"
+        optionValue="value"
+        [editable]="true"
+        [showClear]="true"
+        placeholder="Selecciona o escribe"
+        formControlName="idEstado"
+        (onChange)="onEstadoChange($event.value)"
+      ></p-dropdown>
+      <small *ngIf="formSubmitted && idEstadoControl.invalid" class="field-error">El estado es obligatorio.</small>
+
+      <label for="idClub">Id Club</label>
+      <input id="idClub" type="text" pInputText formControlName="idClub" />
+
+      <div class="pista-form__actions">
+        <button pButton type="button" label="Cancelar" severity="secondary" (click)="closeDialog()"></button>
+        <button pButton type="submit" label="Guardar"></button>
+      </div>
+    </form>
+  </p-dialog>
+</section>

@@ -1,0 +1,92 @@
+<section class="admin-layout">
+  <span class="admin-layout__glow admin-layout__glow--one" aria-hidden="true"></span>
+  <span class="admin-layout__glow admin-layout__glow--two" aria-hidden="true"></span>
+
+  <header class="admin-topbar glassmorphism" role="banner">
+    <div class="admin-topbar__brand">
+      <button
+        type="button"
+        class="admin-icon-button admin-icon-button--menu"
+        (click)="toggleMobileMenu()"
+        aria-label="Abrir menu del dashboard"
+      >
+        <i class="pi" [class.pi-bars]="!isMobileMenuOpen" [class.pi-times]="isMobileMenuOpen"></i>
+      </button>
+      <div>
+        <p class="admin-breadcrumb">Admin / Operations</p>
+        <h1>Ball&Balls Control Center</h1>
+      </div>
+    </div>
+
+    <div class="admin-topbar__actions">
+      <div class="admin-chip">
+        <span>Modules</span>
+        <strong>{{ modules.length + 1 }}</strong>
+      </div>
+      <div class="admin-chip admin-chip--mono">
+        <span>Endpoints</span>
+        <strong>{{ totalEndpoints + 1 }}</strong>
+      </div>
+      <button
+        type="button"
+        class="admin-icon-button"
+        (click)="toggleTheme()"
+        [attr.aria-label]="isDarkTheme ? 'Activar tema claro' : 'Activar tema oscuro'"
+      >
+        <i class="pi" [class.pi-sun]="isDarkTheme" [class.pi-moon]="!isDarkTheme"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-grid">
+    <aside class="admin-sidebar" [class.is-open]="isMobileMenuOpen">
+      <section class="admin-sidebar__meta">
+        <p class="admin-sidebar__eyebrow">Navigation</p>
+        <h2>Panel operativo</h2>
+        <p class="admin-sidebar__subtitle">Gestiona catalogos, disponibilidad y operativa diaria.</p>
+      </section>
+
+      <nav class="admin-nav" aria-label="Dashboard admin modules">
+        <a routerLink="overview" routerLinkActive="active" (click)="closeMobileMenu()" class="admin-nav__entry">
+          <span class="admin-nav__left">
+            <i class="pi pi-chart-pie"></i>
+            <span class="admin-nav__text">
+              <strong>Resumen</strong>
+              <small>Metricas globales</small>
+            </span>
+          </span>
+          <span class="admin-nav__count">1</span>
+        </a>
+
+        <a
+          *ngFor="let module of modules"
+          [routerLink]="module.route"
+          routerLinkActive="active"
+          (click)="closeMobileMenu()"
+          class="admin-nav__entry"
+        >
+          <span class="admin-nav__left">
+            <i [class]="module.icon"></i>
+            <span class="admin-nav__text">
+              <strong>{{ module.name }}</strong>
+              <small>{{ module.summary }}</small>
+            </span>
+          </span>
+          <span class="admin-nav__count">{{ module.endpoints }}</span>
+        </a>
+      </nav>
+    </aside>
+
+    <button
+      *ngIf="isMobileMenuOpen"
+      type="button"
+      class="admin-overlay"
+      (click)="closeMobileMenu()"
+      aria-label="Cerrar menu"
+    ></button>
+
+    <main class="admin-content" role="main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</section>

@@ -4,6 +4,10 @@ export interface CreateDeporteRequest {
     isActive: boolean;
 }
 
+export interface CreateDeporteRequestEnvelope {
+    body: CreateDeporteRequest;
+}
+
 export interface UpdateDeporteRequest {
     slug: string;
     nombre: string;
@@ -11,7 +15,15 @@ export interface UpdateDeporteRequest {
     isActive: boolean;
 }
 
+export interface UpdateDeporteRequestEnvelope {
+    body: UpdateDeporteRequest;
+}
+
 export interface SoftDeleteDeporteRequest {
     slug: string;
     isActive: boolean;
+}
+
+export interface SoftDeleteDeporteRequestEnvelope {
+    body: SoftDeleteDeporteRequest;
 }

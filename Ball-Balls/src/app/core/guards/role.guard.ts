@@ -14,9 +14,15 @@ export const roleGuard: CanActivateFn = (route, state) => {
 
     // Parse JWT manually to check roles without 3rd party libs
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const tokenPayload = token.split('.')[1]
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+
+        const normalized = tokenPayload.padEnd(Math.ceil(tokenPayload.length / 4) * 4, '=');
+        const payload = JSON.parse(atob(normalized));
         // Identity claims in ASP.NET defaults
-        const roles: string | string[] = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || [];
+        const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        const roles: string | string[] = roleClaim || payload.role || payload.roles || [];
         const rolesArray: string[] = Array.isArray(roles) ? roles : [roles];
 
         // Check if the route specifies required roles

@@ -15,6 +15,7 @@ import { ProfileHeaderComponent } from './components/profile-header/profile-head
 import { ProfileSidebarComponent } from './components/profile-sidebar/profile-sidebar.component';
 import { ProfilePublicDataComponent } from './components/profile-public-data/profile-public-data.component';
 import { ProfileSettingsComponent } from './components/profile-settings/profile-settings.component';
+import { ProfileReservasComponent } from './components/profile-reservas/profile-reservas.component';
 
 @Component({
     selector: 'app-profile',
@@ -25,7 +26,8 @@ import { ProfileSettingsComponent } from './components/profile-settings/profile-
         ProfileHeaderComponent,
         ProfileSidebarComponent,
         ProfilePublicDataComponent,
-        ProfileSettingsComponent
+        ProfileSettingsComponent,
+        ProfileReservasComponent
     ],
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.css']
@@ -46,7 +48,7 @@ export class ProfileComponent implements OnInit {
     private routeUrl = toSignal(this.route.url);
 
     // Local State Signals
-    activeTab = signal<'public' | 'settings'>('public');
+    activeTab = signal<'public' | 'settings' | 'reservas'>('public');
 
     // Computed
     isCurrentUser = computed(() => {
@@ -82,7 +84,7 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    setTab(tab: 'public' | 'settings') {
+    setTab(tab: 'public' | 'settings' | 'reservas') {
         this.activeTab.set(tab);
     }
 }

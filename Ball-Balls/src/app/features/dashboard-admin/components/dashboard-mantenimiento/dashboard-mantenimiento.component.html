@@ -1,0 +1,41 @@
+<section class="dashboard-module">
+  <header class="dashboard-module__header">
+    <h2>Mantenimiento</h2>
+    <div class="dashboard-module__actions">
+      <span *ngIf="mantenimientosData() as data">Total: {{ data.total }}</span>
+      <button pButton type="button" label="Recargar" icon="pi pi-refresh" (click)="reload()"></button>
+    </div>
+  </header>
+
+  <div class="dashboard-module__crud">
+    <button pButton type="button" label="Crear" icon="pi pi-plus" [disabled]="true"></button>
+    <button pButton type="button" label="Actualizar" icon="pi pi-refresh" [disabled]="true"></button>
+    <button pButton type="button" label="Desactivar" icon="pi pi-eye-slash" severity="danger" [disabled]="true"></button>
+  </div>
+
+  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando mantenimientos...</p>
+  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+
+  <p-table *ngIf="mantenimientosData() as data" [value]="data.items" [paginator]="true" [rows]="8" responsiveLayout="scroll" styleClass="dashboard-table">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Pista</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Estado</th>
+        <th>Activo</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.nombrePista || '-' }}</td>
+        <td>{{ item.fecha | date: 'shortDate' }}</td>
+        <td>{{ item.horaInicio || '-' }} - {{ item.horaFin || '-' }}</td>
+        <td>{{ item.estado || '-' }}</td>
+        <td>
+          <span class="status" [class.inactive]="!item.isActive">{{ item.isActive ? 'Activo' : 'Inactivo' }}</span>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>

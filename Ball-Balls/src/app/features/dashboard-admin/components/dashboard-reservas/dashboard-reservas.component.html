@@ -1,0 +1,100 @@
+<section class="dashboard-module">
+  <header class="dashboard-module__header">
+    <div>
+      <h2>Reservas</h2>
+      <p class="dashboard-module__subtitle">Gestion de reservas de pistas deportivas</p>
+    </div>
+
+    <div class="dashboard-module__actions">
+      <div class="view-toggle">
+        <button pButton type="button" label="Calendario" [severity]="viewMode === 'calendar' ? undefined : 'secondary'" (click)="setViewMode('calendar')"></button>
+        <button pButton type="button" label="Lista" [severity]="viewMode === 'list' ? undefined : 'secondary'" (click)="setViewMode('list')"></button>
+      </div>
+      <span *ngIf="reservasData() as data">Total: {{ data.total }}</span>
+      <button pButton type="button" label="Recargar" icon="pi pi-refresh" severity="secondary" (click)="reload()"></button>
+    </div>
+  </header>
+
+  <form [formGroup]="filterForm" class="filters-row" (ngSubmit)="applyFilters()" aria-label="Filtros de reservas">
+    <div class="filters-row__card">
+      <div class="filters-row__field">
+        <label for="fecha">Fecha</label>
+        <p-calendar
+          id="fecha"
+          formControlName="fecha"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          [showClear]="true"
+          appendTo="body"
+          styleClass="filters-row__calendar"
+          placeholder="Seleccionar fecha"
+        ></p-calendar>
+      </div>
+
+      <div class="filters-row__field">
+        <label for="estado">Estado</label>
+        <p-dropdown
+          id="estado"
+          [options]="estadoOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="estado"
+          [showClear]="true"
+          placeholder="Seleccionar estado"
+          styleClass="filters-row__dropdown"
+        ></p-dropdown>
+      </div>
+
+      <div class="filters-row__buttons">
+        <button pButton type="submit" label="Aplicar" icon="pi pi-filter"></button>
+        <button pButton type="button" label="Limpiar" severity="secondary" icon="pi pi-trash" (click)="clearFilters()"></button>
+      </div>
+    </div>
+  </form>
+
+  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando reservas...</p>
+  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+
+  <div *ngIf="!isLoading() && viewMode === 'calendar'" class="calendar-card">
+    <full-calendar [options]="calendarOptions"></full-calendar>
+  </div>
+
+  <p-table
+    *ngIf="!isLoading() && viewMode === 'list'"
+    [value]="getFilteredReservas()"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="getFilteredReservas().length"
+    [first]="first"
+    (onPage)="onPageChange($event)"
+    responsiveLayout="scroll"
+    styleClass="dashboard-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>PublicId</th>
+        <th>Pista</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Estado</th>
+        <th>Usuario</th>
+        <th>Precio</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.publicId || '-' }}</td>
+        <td>{{ item.pista || '-' }}</td>
+        <td>{{ item.fechaHoraInicio | date: 'short' }}</td>
+        <td>{{ item.fechaHoraFin | date: 'short' }}</td>
+        <td>{{ item.estado || '-' }}</td>
+        <td>{{ item.usuario || '-' }}</td>
+        <td>{{ item.precioTotal | currency: 'EUR' }}</td>
+        <td class="actions-cell">
+          <button pButton type="button" label="Cancelar" severity="danger" class="p-button-sm" (click)="cancelReserva(item)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>

@@ -50,7 +50,7 @@ export class ListPistasHomeComponent {
         }));
     }
 
-    getStatusClass(estado: string | undefined): string {
+    getStatusClass(estado: string | null | undefined): string {
         if (!estado) return 'badge--available';
         const normalized = estado.toLowerCase();
         if (normalized === 'ocupada') return 'badge--occupied';
@@ -58,7 +58,7 @@ export class ListPistasHomeComponent {
         return 'badge--available';
     }
 
-    getStatusLabel(estado: string | undefined): string {
+    getStatusLabel(estado: string | null | undefined): string {
         if (!estado) return 'Disponible';
         return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
     }

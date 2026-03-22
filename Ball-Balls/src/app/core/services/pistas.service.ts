@@ -7,8 +7,11 @@ import { Pista, PistasResponse } from '../interfaces/Pistas/Pistas.Interface';
 import {
     PistasQueryParams,
     CreatePistaRequest,
+    CreatePistaRequestEnvelope,
     UpdatePistaRequest,
-    SoftDeletePistaRequest
+    UpdatePistaRequestEnvelope,
+    SoftDeletePistaRequest,
+    SoftDeletePistaRequestEnvelope
 } from '../interfaces/Pistas/PistasRequests.Interface';
 
 @Injectable({
@@ -51,7 +54,8 @@ export class PistasService {
      * @param request - Datos de la pista a crear
      */
     createPista(request: CreatePistaRequest): Observable<Pista> {
-        return this.api.post<Pista>(this.endpoint, { body: request });
+        const payload: CreatePistaRequestEnvelope = { body: request };
+        return this.api.post<Pista>(this.endpoint, payload);
     }
 
     /**
@@ -60,7 +64,8 @@ export class PistasService {
      * @param request - Datos actualizados de la pista
      */
     updatePista(slug: string, request: UpdatePistaRequest): Observable<Pista> {
-        return this.api.put<Pista>(`${this.endpoint}/${slug}`, { body: request });
+        const payload: UpdatePistaRequestEnvelope = { body: request };
+        return this.api.put<Pista>(`${this.endpoint}/${slug}`, payload);
     }
 
     /**
@@ -69,6 +74,7 @@ export class PistasService {
      * @param request - Datos de la solicitud de soft delete
      */
     softDeletePista(slug: string, request: SoftDeletePistaRequest): Observable<Pista> {
-        return this.api.patch<Pista>(`${this.endpoint}/${slug}`, { body: request });
+        const payload: SoftDeletePistaRequestEnvelope = { body: request };
+        return this.api.patch<Pista>(`${this.endpoint}/${slug}`, payload);
     }
 }

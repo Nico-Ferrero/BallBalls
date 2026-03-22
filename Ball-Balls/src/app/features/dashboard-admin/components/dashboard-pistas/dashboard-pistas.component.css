@@ -1,0 +1,229 @@
+.dashboard-module {
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-module__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dashboard-module__subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--text-secondary, #457b9d);
+  font-size: 0.85rem;
+}
+
+.dashboard-module__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dashboard-module h2 {
+  margin: 0;
+}
+
+.filters__card {
+  border: 1px solid var(--border-color, #a8dadc);
+  border-radius: 1rem;
+  background: var(--bg-card, #ffffff);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+}
+
+.filters__field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.filters__field label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--text-secondary, #457b9d);
+}
+
+.filters__field--inline .filters__price-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.filters__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.pista-card {
+  border: 1px solid var(--border-color, #a8dadc);
+  border-radius: 1rem;
+  background: var(--bg-card, #ffffff);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.pista-card__media {
+  position: relative;
+  height: 170px;
+}
+
+.pista-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--accent-tertiary, #a8dadc) 20%, transparent);
+}
+
+.pista-card__badge {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent-secondary, #457b9d) 16%, #ffffff);
+  color: var(--accent-secondary, #457b9d);
+}
+
+.pista-card__badge.is-inactive {
+  background: color-mix(in srgb, var(--text-muted, #6c8ea4) 20%, #ffffff);
+  color: var(--text-muted, #6c8ea4);
+}
+
+.pista-card__content {
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.pista-card__content h3 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.pista-card__content p {
+  margin: 0;
+  color: var(--text-secondary, #457b9d);
+  font-size: 0.85rem;
+}
+
+.pista-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pista-card__meta strong {
+  color: var(--text-primary, #1d3557);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+.pista-card__sports {
+  min-height: 2.25rem;
+}
+
+.pista-card__actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid var(--border-color, #a8dadc);
+  border-radius: 0.75rem;
+  background: var(--bg-card, #ffffff);
+  padding: 0.75rem;
+}
+
+.pagination span {
+  color: var(--text-secondary, #457b9d);
+  font-weight: 600;
+}
+
+.dashboard-module__state {
+  margin: 0;
+  color: var(--text-secondary, #457b9d);
+}
+
+.dashboard-module__state--error {
+  color: var(--accent-error, #d62828);
+}
+
+.pista-form {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.pista-form label {
+  font-weight: 600;
+  color: var(--text-primary, #1d3557);
+}
+
+.pista-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.field-invalid {
+  border-color: var(--accent-error, #d62828) !important;
+}
+
+.field-error {
+  color: var(--accent-error, #d62828);
+  font-size: 0.8rem;
+}
+
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-calendar,
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputtextarea,
+:host ::ng-deep .p-multiselect {
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .filters__card {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-module__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-module__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filters__card {
+    grid-template-columns: 1fr;
+  }
+
+  .filters__actions {
+    justify-content: flex-start;
+  }
+}

@@ -4,8 +4,11 @@ import { ApiService } from './api.service';
 import { Deporte, DeportesResponse } from '../interfaces/Deportes/Deportes.Interface';
 import {
     CreateDeporteRequest,
+    CreateDeporteRequestEnvelope,
     UpdateDeporteRequest,
-    SoftDeleteDeporteRequest
+    UpdateDeporteRequestEnvelope,
+    SoftDeleteDeporteRequest,
+    SoftDeleteDeporteRequestEnvelope
 } from '../interfaces/Deportes/DeportesRequests.Interface';
 
 @Injectable({
@@ -35,7 +38,8 @@ export class DeportesService {
      * @param request - Datos del deporte a crear
      */
     createDeporte(request: CreateDeporteRequest): Observable<Deporte> {
-        return this.api.post<Deporte>(this.endpoint, { body: request });
+        const payload: CreateDeporteRequestEnvelope = { body: request };
+        return this.api.post<Deporte>(this.endpoint, payload);
     }
 
     /**
@@ -44,7 +48,8 @@ export class DeportesService {
      * @param request - Datos actualizados del deporte
      */
     updateDeporte(slug: string, request: UpdateDeporteRequest): Observable<Deporte> {
-        return this.api.put<Deporte>(`${this.endpoint}/${slug}`, { body: request });
+        const payload: UpdateDeporteRequestEnvelope = { body: request };
+        return this.api.put<Deporte>(`${this.endpoint}/${slug}`, payload);
     }
 
     /**
@@ -53,6 +58,7 @@ export class DeportesService {
      * @param request - Datos de la solicitud de soft delete
      */
     softDeleteDeporte(slug: string, request: SoftDeleteDeporteRequest): Observable<Deporte> {
-        return this.api.patch<Deporte>(`${this.endpoint}/${slug}`, { body: request });
+        const payload: SoftDeleteDeporteRequestEnvelope = { body: request };
+        return this.api.patch<Deporte>(`${this.endpoint}/${slug}`, payload);
     }
 }

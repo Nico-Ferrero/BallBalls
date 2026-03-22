@@ -9,6 +9,14 @@
     </button>
 
     @if (isCurrentUser()) {
+    <button (click)="onTabChange('reservas')"
+        class="flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-200 font-medium w-full text-left outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/50"
+        [ngClass]="activeTab() === 'reservas' ? 'bg-[var(--accent-primary)] text-white shadow-md' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]'">
+        <i class="pi pi-calendar text-xl"
+            [ngClass]="activeTab() === 'reservas' ? 'text-white' : 'text-[var(--text-muted)]'"></i>
+        Mis Reservas
+    </button>
+
     <button (click)="onTabChange('settings')"
         class="flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-200 font-medium w-full text-left outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/50"
         [ngClass]="activeTab() === 'settings' ? 'bg-[var(--accent-primary)] text-white shadow-md' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]'">

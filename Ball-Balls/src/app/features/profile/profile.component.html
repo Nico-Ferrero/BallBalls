@@ -30,6 +30,11 @@
                 <app-profile-settings [profile]="profile()">
                 </app-profile-settings>
                 }
+
+                @case ('reservas') {
+                <app-profile-reservas [profile]="profile()">
+                </app-profile-reservas>
+                }
                 }
                 } @else if (error()) {
                 <div

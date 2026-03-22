@@ -1,12 +1,12 @@
 export interface Reserva {
-    publicId: string;
-    pista: string;
-    fechaHoraInicio: string;
-    fechaHoraFin: string;
+    publicId: string | null;
+    pista: string | null;
+    fechaHoraInicio: string | null;
+    fechaHoraFin: string | null;
     precioTotal: number;
 
-    estado: string;
-    tipo: string;
+    estado: string | null;
+    tipo: string | null;
     club: string | null;
 
     usuario: string | null;

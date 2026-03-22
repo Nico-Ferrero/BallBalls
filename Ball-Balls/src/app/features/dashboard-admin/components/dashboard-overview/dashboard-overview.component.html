@@ -1,0 +1,39 @@
+<section class="dashboard-module">
+  <header class="dashboard-module__header">
+    <h2>Resumen</h2>
+    <a routerLink="../deportes">Ir a Deportes</a>
+  </header>
+
+  <div class="dashboard-module__crud">
+    <button pButton type="button" label="Crear" icon="pi pi-plus" [disabled]="true"></button>
+    <button pButton type="button" label="Actualizar" icon="pi pi-refresh" [disabled]="true"></button>
+    <button pButton type="button" label="Desactivar" icon="pi pi-eye-slash" severity="danger" [disabled]="true"></button>
+  </div>
+
+  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando metricas...</p>
+  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+
+  <div *ngIf="stats() as stats" class="kpi-grid">
+    <article class="kpi-card">
+      <span>Deportes</span>
+      <strong>{{ stats.deportesTotal }}</strong>
+    </article>
+    <article class="kpi-card">
+      <span>Pistas</span>
+      <strong>{{ stats.pistasTotal }}</strong>
+    </article>
+    <article class="kpi-card">
+      <span>Mantenimientos</span>
+      <strong>{{ stats.mantenimientosTotal }}</strong>
+    </article>
+    <article class="kpi-card">
+      <span>Reservas</span>
+      <strong>{{ stats.reservasTotal }}</strong>
+    </article>
+  </div>
+
+  <article *ngIf="stats() as stats" class="chart-card">
+    <h3>Distribucion de modulos</h3>
+    <p-chart type="doughnut" [data]="buildChartData(stats)"></p-chart>
+  </article>
+</section>

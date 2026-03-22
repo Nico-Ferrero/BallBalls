@@ -1,21 +1,18 @@
-import { Deporte } from "../Deportes/Deportes.Interface";
-
 export interface Pista {
-    slug: string;
-    nombre: string;
-    descripcion: string;
-    imagen?: string;            // URL de imagen
-    precio: number;             // Llega con formato decimal
-
-    deporte: Deporte;
-    tipoPista: string;
-    estado: string;
-    idUsuario: string;
+    slug: string | null;
+    nombre: string | null;
+    descripcion: string | null;
+    imagen: string | null;
+    precio: number;
+    deportes: string[] | null;
+    tipoPista: string | null;
+    estado: string | null;
+    idUsuario: string | null;
     idUsuarioModificacion: string | null;
 
     isActive: boolean;
-    fechaCreacion: string;      // Formato ISO8601
-    fechaActualizacion: string; // Formato ISO8601
+    fechaCreacion: string;     // Formato ISO8601
+    fechaModificacion: string; // Formato ISO8601
 }
 
 export interface PistasResponse {
