@@ -55,4 +55,24 @@
             </div>
         </div>
     </app-profile-header>
+
+    <!-- ── FAB Sugerencias IA ─────────────────────────────────────────── -->
+    <!-- Renderizado aquí (nivel raíz) para evitar que transform en hijos  -->
+    <!-- rompa position:fixed según el CSS Containing Block spec.         -->
+    @if (activeTab() === 'reservas' && ai.reservasLoaded()) {
+        <button class="ai-fab"
+            [class.ai-fab--loading]="ai.aiLoading()"
+            [class.ai-fab--error]="ai.aiError()"
+            [title]="ai.aiLoading() ? 'Analizando tu historial...' : 'Ver sugerencias de pistas para ti'"
+            (click)="ai.openDialog()"
+            aria-label="Abrir sugerencias de pistas IA">
+            @if (ai.aiLoading()) {
+                <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+            } @else if (ai.aiError()) {
+                <i class="pi pi-refresh" aria-hidden="true"></i>
+            } @else {
+                <i class="pi pi-sparkles" aria-hidden="true"></i>
+            }
+        </button>
+    }
 </div>

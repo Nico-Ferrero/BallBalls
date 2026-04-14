@@ -5,6 +5,7 @@ import * as ProfileActions from './actions';
 import { ProfilesService } from '../../../core/services/profiles.service';
 import { UsersService } from '../../../core/services/users.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ReservasService } from '../../../core/services/reservas.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
@@ -14,6 +15,7 @@ export class ProfileEffects {
     private profilesService = inject(ProfilesService);
     private usersService = inject(UsersService);
     private authService = inject(AuthService);
+    private reservasService = inject(ReservasService);
 
     loadProfile$ = createEffect(() =>
         this.actions$.pipe(
@@ -58,6 +60,39 @@ export class ProfileEffects {
                             confirmButtonColor: '#ef4444'
                         });
                         return of(ProfileActions.updateProfileFailure({ error: errorMsg }));
+                    })
+                )
+            )
+        )
+    );
+
+    cancelReserva$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(ProfileActions.cancelReserva),
+            mergeMap(({ publicId }) =>
+                this.reservasService.cancelReserva(publicId).pipe(
+                    map(() => {
+                        Swal.fire({
+                            title: 'Reserva cancelada',
+                            text: 'El reembolso ha sido procesado correctamente.',
+                            icon: 'success',
+                            background: '#1e1e2d',
+                            color: '#fff',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        return ProfileActions.cancelReservaSuccess({ publicId });
+                    }),
+                    catchError((error: HttpErrorResponse) => {
+                        const errorMsg = error.error?.message || error.error?.title || 'No se pudo cancelar la reserva.';
+                        Swal.fire({
+                            title: 'Error al cancelar',
+                            text: errorMsg,
+                            icon: 'error',
+                            background: '#1e1e2d',
+                            color: '#fff',
+                            confirmButtonColor: '#ef4444'
+                        });
+                        return of(ProfileActions.cancelReservaFailure({ error: errorMsg }));
                     })
                 )
             )

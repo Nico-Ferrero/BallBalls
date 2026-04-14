@@ -33,3 +33,19 @@ export const updateProfileFailure = createAction(
     '[Profile] Update Profile Failure',
     props<{ error: string }>()
 );
+
+// --- Cancel Reserva Actions ---
+export const cancelReserva = createAction(
+    '[Profile Reservas] Cancel Reserva',
+    props<{ publicId: string }>()
+);
+
+export const cancelReservaSuccess = createAction(
+    '[Profile Reservas] Cancel Reserva Success',
+    props<{ publicId: string }>()
+);
+
+export const cancelReservaFailure = createAction(
+    '[Profile Reservas] Cancel Reserva Failure',
+    props<{ error: string }>()
+);
