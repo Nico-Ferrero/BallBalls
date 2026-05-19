@@ -1,39 +1,178 @@
-<section class="dashboard-module">
-  <header class="dashboard-module__header">
-    <h2>Resumen</h2>
-    <a routerLink="../deportes">Ir a Deportes</a>
+<section class="module" #host>
+  <header class="module-header" data-reveal>
+    <div class="module-header__title">
+      <span class="eyebrow"><span class="eyebrow__dot"></span>Resumen operativo</span>
+      <h2>Pulso del centro deportivo</h2>
+      <p>Vista consolidada de catálogo, ocupación y operativa. Los datos se refrescan al entrar.</p>
+    </div>
+
+    <div class="module-header__actions">
+      <a routerLink="../reservas" class="btn-island btn-island--ghost">
+        <span>Ir a reservas</span>
+        <span class="btn-island__icon"><i class="pi pi-arrow-right"></i></span>
+      </a>
+      <button type="button" class="btn-island" (click)="reload()">
+        <span>Refrescar</span>
+        <span class="btn-island__icon"><i class="pi pi-refresh"></i></span>
+      </button>
+    </div>
   </header>
 
-  <div class="dashboard-module__crud">
-    <button pButton type="button" label="Crear" icon="pi pi-plus" [disabled]="true"></button>
-    <button pButton type="button" label="Actualizar" icon="pi pi-refresh" [disabled]="true"></button>
-    <button pButton type="button" label="Desactivar" icon="pi pi-eye-slash" severity="danger" [disabled]="true"></button>
+  <div *ngIf="error()" class="bezel bezel--ghost" data-reveal>
+    <div class="bezel__core empty-state">
+      <span class="empty-state__icon"><i class="pi pi-exclamation-triangle"></i></span>
+      <h3>No pudimos cargar el resumen</h3>
+      <p>{{ error() }}</p>
+    </div>
   </div>
 
-  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando metricas...</p>
-  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+  <!-- KPIs -->
+  <div class="kpi-strip">
+    <ng-container *ngIf="isLoading() && !stats(); else kpiList">
+      <div class="skeleton-tile" *ngFor="let i of [1,2,3,4]"></div>
+    </ng-container>
+    <ng-template #kpiList>
+      <article class="bezel bezel--interactive" *ngFor="let kpi of kpis(); trackBy: trackKpi" data-reveal>
+        <div class="bezel__core kpi-tile">
+          <span class="kpi-tile__label">
+            <span class="kpi-tile__icon"><i [class]="kpi.icon"></i></span>
+            {{ kpi.label }}
+          </span>
+          <strong class="kpi-tile__value">{{ kpi.value }}</strong>
+          <span
+            class="kpi-tile__delta"
+            [class.kpi-tile__delta--up]="kpi.trend === 'up'"
+            [class.kpi-tile__delta--down]="kpi.trend === 'down'"
+          >
+            <i class="pi" [class.pi-arrow-up-right]="kpi.trend === 'up'" [class.pi-arrow-down-right]="kpi.trend === 'down'" [class.pi-minus]="kpi.trend === 'flat'"></i>
+            {{ kpi.delta }}
+          </span>
+        </div>
+      </article>
+    </ng-template>
+  </div>
 
-  <div *ngIf="stats() as stats" class="kpi-grid">
-    <article class="kpi-card">
-      <span>Deportes</span>
-      <strong>{{ stats.deportesTotal }}</strong>
+  <!-- Charts row -->
+  <div class="charts-grid">
+    <article class="bezel" data-reveal>
+      <div class="bezel__core chart-card">
+        <header>
+          <span class="eyebrow"><span class="eyebrow__dot"></span>Últimos 7 días</span>
+          <h3>Reservas por día</h3>
+          <p>Distribución temporal de la actividad reciente.</p>
+        </header>
+        <div class="chart-card__canvas">
+          <p-chart type="bar" [data]="barData()" [options]="barOptions" height="220px"></p-chart>
+        </div>
+      </div>
     </article>
-    <article class="kpi-card">
-      <span>Pistas</span>
-      <strong>{{ stats.pistasTotal }}</strong>
-    </article>
-    <article class="kpi-card">
-      <span>Mantenimientos</span>
-      <strong>{{ stats.mantenimientosTotal }}</strong>
-    </article>
-    <article class="kpi-card">
-      <span>Reservas</span>
-      <strong>{{ stats.reservasTotal }}</strong>
+
+    <article class="bezel" data-reveal>
+      <div class="bezel__core chart-card">
+        <header>
+          <span class="eyebrow"><span class="eyebrow__dot"></span>Estado</span>
+          <h3>Distribución de reservas</h3>
+          <p>Por estado del ciclo: pagado, pendiente, cancelado.</p>
+        </header>
+        <div class="chart-card__canvas chart-card__canvas--centered">
+          <p-chart *ngIf="reservasPorEstado().size > 0; else emptyChart" type="doughnut" [data]="doughnutData()" [options]="doughnutOptions" height="220px"></p-chart>
+          <ng-template #emptyChart>
+            <div class="empty-state">
+              <span class="empty-state__icon"><i class="pi pi-chart-pie"></i></span>
+              <p>Sin reservas registradas todavía.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
     </article>
   </div>
 
-  <article *ngIf="stats() as stats" class="chart-card">
-    <h3>Distribucion de modulos</h3>
-    <p-chart type="doughnut" [data]="buildChartData(stats)"></p-chart>
-  </article>
+  <!-- Bottom row: top pistas + próximos mantenimientos + actividad reciente -->
+  <div class="insights-grid">
+    <article class="bezel" data-reveal>
+      <div class="bezel__core insight-card">
+        <header>
+          <span class="eyebrow"><span class="eyebrow__dot"></span>Demanda</span>
+          <h3>Top pistas</h3>
+        </header>
+
+        <ul class="rank-list" *ngIf="topPistas().length > 0; else noRank">
+          <li *ngFor="let p of topPistas(); let i = index; trackBy: trackPista" class="rank-list__item">
+            <span class="rank-list__rank">{{ i + 1 }}</span>
+            <div class="rank-list__body">
+              <strong>{{ p.nombre }}</strong>
+              <span class="rank-list__meta">{{ p.count }} reservas</span>
+            </div>
+            <div class="rank-list__bar">
+              <span class="rank-list__bar-fill" [style.width.%]="barIntensity(p.count) * 100"></span>
+            </div>
+          </li>
+        </ul>
+        <ng-template #noRank>
+          <div class="empty-state">
+            <span class="empty-state__icon"><i class="pi pi-th-large"></i></span>
+            <p>Aún no hay datos de demanda por pista.</p>
+          </div>
+        </ng-template>
+      </div>
+    </article>
+
+    <article class="bezel" data-reveal>
+      <div class="bezel__core insight-card">
+        <header>
+          <span class="eyebrow"><span class="eyebrow__dot"></span>Calendario</span>
+          <h3>Próximos mantenimientos</h3>
+          <a routerLink="../mantenimiento" class="insight-card__link">Ver todos <i class="pi pi-arrow-right"></i></a>
+        </header>
+
+        <ul class="event-list" *ngIf="proximosMantenimientos().length > 0; else noMant">
+          <li *ngFor="let m of proximosMantenimientos(); trackBy: trackMantenimiento" class="event-list__item">
+            <span class="event-list__date">
+              <strong>{{ m.fecha | date: 'd' }}</strong>
+              <small>{{ m.fecha | date: 'MMM' }}</small>
+            </span>
+            <div class="event-list__body">
+              <strong>{{ m.nombrePista ?? 'Pista no asignada' }}</strong>
+              <span class="event-list__meta">{{ m.horaInicio }} → {{ m.horaFin }} · {{ m.estado || 'Programado' }}</span>
+            </div>
+          </li>
+        </ul>
+        <ng-template #noMant>
+          <div class="empty-state">
+            <span class="empty-state__icon"><i class="pi pi-calendar"></i></span>
+            <p>Sin mantenimientos próximos.</p>
+          </div>
+        </ng-template>
+      </div>
+    </article>
+
+    <article class="bezel" data-reveal>
+      <div class="bezel__core insight-card">
+        <header>
+          <span class="eyebrow"><span class="eyebrow__dot"></span>Actividad reciente</span>
+          <h3>Últimas reservas</h3>
+          <a routerLink="../reservas" class="insight-card__link">Detalle <i class="pi pi-arrow-right"></i></a>
+        </header>
+
+        <ul class="activity-list" *ngIf="ultimasReservas().length > 0; else noActivity">
+          <li *ngFor="let r of ultimasReservas(); trackBy: trackReserva" class="activity-list__item">
+            <div class="activity-list__icon">
+              <i class="pi pi-calendar-plus"></i>
+            </div>
+            <div class="activity-list__body">
+              <strong>{{ r.pista ?? 'Pista' }}</strong>
+              <span class="activity-list__meta">{{ r.usuario ?? 'Usuario' }} · {{ r.fechaHoraInicio | date: 'd MMM HH:mm' }}</span>
+            </div>
+            <span [class]="estadoPillClass(r.estado)">{{ r.estado || 'N/A' }}</span>
+          </li>
+        </ul>
+        <ng-template #noActivity>
+          <div class="empty-state">
+            <span class="empty-state__icon"><i class="pi pi-bolt"></i></span>
+            <p>Aún no hay actividad reciente.</p>
+          </div>
+        </ng-template>
+      </div>
+    </article>
+  </div>
 </section>

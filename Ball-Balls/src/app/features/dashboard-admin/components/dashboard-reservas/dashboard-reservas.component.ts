@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { revealOnView } from '../../shared/motion.util';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
@@ -34,9 +35,12 @@ interface EstadoOption {
   styleUrl: './dashboard-reservas.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardReservasComponent implements OnInit {
+export class DashboardReservasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly store = inject(Store);
   private readonly fb = inject(FormBuilder);
+
+  @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
+  private stopReveal: () => void = () => undefined;
 
   viewMode: 'list' | 'calendar' = 'calendar';
   first = 0;
@@ -73,8 +77,49 @@ export class DashboardReservasComponent implements OnInit {
     };
   }
 
+  readonly metrics = computed(() => {
+    const items = this.reservasData()?.items ?? [];
+    const total = items.length;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const hoy = items.filter((r) => {
+      if (!r.fechaHoraInicio) return false;
+      const t = new Date(r.fechaHoraInicio).getTime();
+      return t >= today.getTime() && t < tomorrow.getTime();
+    }).length;
+
+    const pagadas = items.filter((r) => (r.estado ?? '').toUpperCase() === 'PAID').length;
+    const pendientes = items.filter((r) => (r.estado ?? '').toUpperCase() === 'PENDING').length;
+    const ingresos = items
+      .filter((r) => (r.estado ?? '').toUpperCase() === 'PAID')
+      .reduce((acc, r) => acc + (r.precioTotal ?? 0), 0);
+
+    return { total, hoy, pagadas, pendientes, ingresos };
+  });
+
+  estadoPillClass(estado: string | null | undefined): string {
+    const v = (estado ?? '').toUpperCase();
+    if (v === 'PAID' || v === 'CONFIRMADA') return 'pill pill--success';
+    if (v === 'PENDING' || v === 'PENDIENTE') return 'pill pill--warning';
+    if (v === 'CANCELADA' || v === 'CANCELLED') return 'pill pill--danger';
+    return 'pill pill--info';
+  }
+
+  trackByPublicId = (_: number, r: { publicId: string | null }) => r.publicId ?? Math.random();
+
   ngOnInit(): void {
     this.store.dispatch(loadDashboardAdminReservas({}));
+  }
+
+  ngAfterViewInit(): void {
+    queueMicrotask(() => { this.stopReveal = revealOnView(this.hostRef.nativeElement); });
+  }
+
+  ngOnDestroy(): void {
+    this.stopReveal();
   }
 
   setViewMode(mode: 'list' | 'calendar'): void {

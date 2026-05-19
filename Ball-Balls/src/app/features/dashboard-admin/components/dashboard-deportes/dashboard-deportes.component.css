@@ -1,100 +1,89 @@
-.dashboard-module {
+.module {
   display: grid;
-  gap: 0.9rem;
+  gap: 1.1rem;
 }
 
-.dashboard-module__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.dashboard-module__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.dashboard-module__crud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.dashboard-module h2 {
-  margin: 0;
-}
-
-.dashboard-module__header span {
-  color: var(--text-secondary, #457b9d);
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
 }
 
 .dashboard-module__state {
   margin: 0;
-  color: var(--text-secondary, #457b9d);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
 }
 
 .dashboard-module__state--error {
-  color: var(--accent-error, #d62828);
+  color: var(--accent-error);
 }
 
-.dashboard-table {
-  border: 1px solid var(--border-color, #a8dadc);
-  border-radius: 0.75rem;
-  overflow: hidden;
+.deportes-table-wrap {
+  padding: 0.4rem 0.4rem 0.6rem;
+}
+
+.row-slug {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.row-desc {
+  max-width: 28rem;
+  color: var(--text-secondary);
+}
+
+.text-right {
+  text-align: right;
 }
 
 .actions-cell {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.4rem;
   align-items: center;
-}
-
-.status {
-  color: var(--accent-secondary, #457b9d);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.status.inactive {
-  color: var(--text-muted, #6c8ea4);
+  justify-content: flex-end;
 }
 
 .deporte-form {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.85rem;
+  padding-top: 0.3rem;
 }
 
-.deporte-form label {
+.deporte-form__field {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.deporte-form__field label {
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
   font-weight: 600;
-  color: var(--text-primary, #1d3557);
+}
+
+.field-invalid {
+  border-color: var(--accent-error) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-error) 18%, transparent) !important;
+}
+
+.field-error {
+  color: var(--accent-error);
+  font-size: 0.74rem;
 }
 
 .deporte-form__actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.field-invalid {
-  border-color: var(--accent-error, #d62828) !important;
-}
-
-.field-error {
-  color: var(--accent-error, #d62828);
-  font-size: 0.8rem;
+  margin-top: 0.3rem;
 }
 
 @media (max-width: 720px) {
-  .dashboard-module__header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .dashboard-module__actions {
-    width: 100%;
-    justify-content: space-between;
+  .actions-cell {
+    flex-wrap: wrap;
   }
 }

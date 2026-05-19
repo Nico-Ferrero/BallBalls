@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { revealOnView } from '../../shared/motion.util';
 import {
   createDashboardAdminDeporte,
   loadDashboardAdminDeportes,
@@ -37,9 +38,12 @@ import Swal from 'sweetalert2';
   styleUrl: './dashboard-deportes.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardDeportesComponent implements OnInit {
+export class DashboardDeportesComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly store = inject(Store);
   private readonly fb = inject(FormBuilder);
+
+  @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
+  private stopReveal: () => void = () => undefined;
 
   dialogVisible = false;
   editingSlug: string | null = null;
@@ -55,8 +59,25 @@ export class DashboardDeportesComponent implements OnInit {
   readonly isLoading = this.store.selectSignal(selectDashboardAdminDeportesLoading);
   readonly error = this.store.selectSignal(selectDashboardAdminDeportesError);
 
+  readonly metrics = computed(() => {
+    const items = this.deportesData()?.items ?? [];
+    const total = items.length;
+    const activos = items.filter((d) => d.isActive).length;
+    return { total, activos, inactivos: total - activos };
+  });
+
+  trackBySlug = (_: number, d: { slug: string | null }) => d.slug ?? '';
+
   ngOnInit(): void {
     this.store.dispatch(loadDashboardAdminDeportes());
+  }
+
+  ngAfterViewInit(): void {
+    queueMicrotask(() => { this.stopReveal = revealOnView(this.hostRef.nativeElement); });
+  }
+
+  ngOnDestroy(): void {
+    this.stopReveal();
   }
 
   openCreateDialog(): void {

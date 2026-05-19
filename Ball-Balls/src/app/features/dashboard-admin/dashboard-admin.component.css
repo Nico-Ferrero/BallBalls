@@ -53,10 +53,12 @@
 }
 
 .admin-topbar__brand h1 {
-  margin: 0;
+  margin: 0.35rem 0 0;
   font-size: clamp(1.1rem, 1.4vw, 1.45rem);
-  line-height: 1.1;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
+  font-weight: 700;
 }
 
 .admin-breadcrumb {

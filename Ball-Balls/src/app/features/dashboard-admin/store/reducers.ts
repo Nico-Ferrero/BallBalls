@@ -94,6 +94,11 @@ export const dashboardAdminReducer = createReducer<DashboardAdminState>(
     isMantenimientosLoading: false,
     mantenimientosError: error
   })),
+  on(DashboardAdminActions.mutateDashboardAdminMantenimientoFailure, (state, { error }) => ({
+    ...state,
+    isMantenimientosLoading: false,
+    mantenimientosError: error
+  })),
   on(DashboardAdminActions.loadDashboardAdminReservas, (state) => ({
     ...state,
     isReservasLoading: true,

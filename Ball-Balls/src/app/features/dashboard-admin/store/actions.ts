@@ -15,6 +15,10 @@ import {
   UpdatePistaRequest
 } from '../../../core/interfaces/Pistas/PistasRequests.Interface';
 import { UpdateUserRequest } from '../../../core/interfaces/Users/UserRequest.interface';
+import {
+  CreateMantenimientoRequest,
+  UpdateMantenimientoRequest
+} from '../../../core/interfaces/Mantenimientos/MantenimientosRequests.Interface';
 
 export const loadDashboardAdminStats = createAction('[Dashboard Admin] Load Stats');
 
@@ -108,6 +112,26 @@ export const loadDashboardAdminMantenimientosSuccess = createAction(
 
 export const loadDashboardAdminMantenimientosFailure = createAction(
   '[Dashboard Admin] Load Mantenimientos Failure',
+  props<{ error: string }>()
+);
+
+export const createDashboardAdminMantenimiento = createAction(
+  '[Dashboard Admin] Create Mantenimiento',
+  props<{ request: CreateMantenimientoRequest }>()
+);
+
+export const updateDashboardAdminMantenimiento = createAction(
+  '[Dashboard Admin] Update Mantenimiento',
+  props<{ publicId: string; request: UpdateMantenimientoRequest }>()
+);
+
+export const toggleDashboardAdminMantenimiento = createAction(
+  '[Dashboard Admin] Toggle Mantenimiento Active',
+  props<{ publicId: string; request: UpdateMantenimientoRequest }>()
+);
+
+export const mutateDashboardAdminMantenimientoFailure = createAction(
+  '[Dashboard Admin] Mutate Mantenimiento Failure',
   props<{ error: string }>()
 );
 
