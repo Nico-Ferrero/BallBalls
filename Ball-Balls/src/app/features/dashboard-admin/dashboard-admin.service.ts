@@ -24,6 +24,10 @@ import {
 } from '../../core/interfaces/Pistas/PistasRequests.Interface';
 import { ProfilesService } from '../../core/services/profiles.service';
 import { UpdateUserRequest } from '../../core/interfaces/Users/UserRequest.interface';
+import {
+  CreateMantenimientoRequest,
+  UpdateMantenimientoRequest
+} from '../../core/interfaces/Mantenimientos/MantenimientosRequests.Interface';
 
 @Injectable({
   providedIn: 'root'
@@ -114,6 +118,14 @@ export class DashboardAdminService {
         total: response.total
       }))
     );
+  }
+
+  createMantenimiento(request: CreateMantenimientoRequest): Observable<unknown> {
+    return this.mantenimientosService.createMantenimiento(request);
+  }
+
+  updateMantenimiento(publicId: string, request: UpdateMantenimientoRequest): Observable<unknown> {
+    return this.mantenimientosService.updateMantenimiento(publicId, request);
   }
 
   loadReservas(fecha?: string): Observable<DashboardAdminReservasData> {

@@ -1,41 +1,232 @@
-<section class="dashboard-module">
-  <header class="dashboard-module__header">
-    <h2>Mantenimiento</h2>
-    <div class="dashboard-module__actions">
-      <span *ngIf="mantenimientosData() as data">Total: {{ data.total }}</span>
-      <button pButton type="button" label="Recargar" icon="pi pi-refresh" (click)="reload()"></button>
+<section class="module" #host>
+  <header class="module-header" data-reveal>
+    <div class="module-header__title">
+      <span class="eyebrow"><span class="eyebrow__dot"></span>Operativa · mantenimiento</span>
+      <h2>Programación de mantenimientos</h2>
+      <p>Bloquea franjas horarias en pistas para revisiones, mantenimiento o eventos puntuales.</p>
+    </div>
+
+    <div class="module-header__actions">
+      <button type="button" class="btn-island btn-island--ghost" (click)="reload()" [attr.disabled]="isLoading() ? '' : null">
+        <span>Recargar</span>
+        <span class="btn-island__icon"><i class="pi pi-refresh"></i></span>
+      </button>
+      <button type="button" class="btn-island" (click)="openCreateDialog()">
+        <span>Programar</span>
+        <span class="btn-island__icon"><i class="pi pi-plus"></i></span>
+      </button>
     </div>
   </header>
 
-  <div class="dashboard-module__crud">
-    <button pButton type="button" label="Crear" icon="pi pi-plus" [disabled]="true"></button>
-    <button pButton type="button" label="Actualizar" icon="pi pi-refresh" [disabled]="true"></button>
-    <button pButton type="button" label="Desactivar" icon="pi pi-eye-slash" severity="danger" [disabled]="true"></button>
+  <!-- KPI strip -->
+  <div class="kpi-strip" data-reveal>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-wrench"></i></span>Total</span>
+        <strong class="kpi-tile__value">{{ metrics().total }}</strong>
+        <span class="kpi-tile__delta">Registrados en el sistema</span>
+      </div>
+    </article>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-check-circle"></i></span>Activos</span>
+        <strong class="kpi-tile__value">{{ metrics().activos }}</strong>
+        <span class="kpi-tile__delta kpi-tile__delta--up">En vigor</span>
+      </div>
+    </article>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-ban"></i></span>Inactivos</span>
+        <strong class="kpi-tile__value">{{ metrics().inactivos }}</strong>
+        <span class="kpi-tile__delta">Archivados / completados</span>
+      </div>
+    </article>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-calendar"></i></span>Próximos</span>
+        <strong class="kpi-tile__value">{{ metrics().futuros }}</strong>
+        <span class="kpi-tile__delta">A partir de hoy</span>
+      </div>
+    </article>
   </div>
 
-  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando mantenimientos...</p>
-  <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
+  <!-- Filters -->
+  <div class="bezel bezel--ghost" data-reveal>
+    <form class="bezel__core filter-bar" [formGroup]="filterForm">
+      <div class="filter-bar__field">
+        <label for="flt-pista">Pista</label>
+        <p-dropdown
+          id="flt-pista"
+          [options]="pistaOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="pista"
+          [showClear]="true"
+          placeholder="Todas las pistas"
+          appendTo="body"
+        ></p-dropdown>
+      </div>
+      <div class="filter-bar__field">
+        <label for="flt-estado">Estado</label>
+        <p-dropdown
+          id="flt-estado"
+          [options]="estadoOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="estado"
+          appendTo="body"
+        ></p-dropdown>
+      </div>
+      <div class="filter-bar__field">
+        <label for="flt-desde">Desde</label>
+        <p-calendar
+          id="flt-desde"
+          formControlName="desde"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          [showClear]="true"
+          appendTo="body"
+          placeholder="Cualquier fecha"
+        ></p-calendar>
+      </div>
+      <div class="filter-bar__actions">
+        <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="clearFilters()">
+          <span>Limpiar</span>
+          <span class="btn-island__icon"><i class="pi pi-trash"></i></span>
+        </button>
+      </div>
+    </form>
+  </div>
 
-  <p-table *ngIf="mantenimientosData() as data" [value]="data.items" [paginator]="true" [rows]="8" responsiveLayout="scroll" styleClass="dashboard-table">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Pista</th>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Estado</th>
-        <th>Activo</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-item>
-      <tr>
-        <td>{{ item.nombrePista || '-' }}</td>
-        <td>{{ item.fecha | date: 'shortDate' }}</td>
-        <td>{{ item.horaInicio || '-' }} - {{ item.horaFin || '-' }}</td>
-        <td>{{ item.estado || '-' }}</td>
-        <td>
-          <span class="status" [class.inactive]="!item.isActive">{{ item.isActive ? 'Activo' : 'Inactivo' }}</span>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <!-- Loading -->
+  <div *ngIf="isLoading()" class="grid-cards">
+    <div class="skeleton-tile" *ngFor="let i of [1,2,3,4]"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!isLoading() && error()" class="bezel bezel--ghost" data-reveal>
+    <div class="bezel__core empty-state">
+      <span class="empty-state__icon"><i class="pi pi-exclamation-triangle"></i></span>
+      <h3>No pudimos cargar los mantenimientos</h3>
+      <p>{{ error() }}</p>
+      <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="reload()">
+        <span>Reintentar</span>
+        <span class="btn-island__icon"><i class="pi pi-refresh"></i></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!isLoading() && !error() && filtered().length === 0" class="bezel bezel--ghost" data-reveal>
+    <div class="bezel__core empty-state">
+      <span class="empty-state__icon"><i class="pi pi-calendar-times"></i></span>
+      <h3>Sin mantenimientos para los filtros actuales</h3>
+      <p>Crea uno nuevo o ajusta los filtros para verlos.</p>
+    </div>
+  </div>
+
+  <!-- Cards grid -->
+  <div *ngIf="!isLoading() && filtered().length > 0" class="grid-cards">
+    <article class="bezel bezel--interactive" *ngFor="let m of filtered(); trackBy: trackById" data-reveal>
+      <div class="bezel__core mant-card" [class.is-inactive]="!m.isActive">
+        <header class="mant-card__head">
+          <div class="mant-card__title">
+            <span class="eyebrow">
+              <span class="eyebrow__dot"></span>
+              {{ m.fecha | date: 'EEE d MMM' }}
+            </span>
+            <h3>{{ m.nombrePista ?? 'Pista sin asignar' }}</h3>
+            <p>{{ formatHora(m.horaInicio) }} → {{ formatHora(m.horaFin) }}</p>
+          </div>
+          <span [class]="pillClass(m)">{{ m.isActive ? (m.estado || 'Programado') : 'Inactivo' }}</span>
+        </header>
+
+        <p class="mant-card__desc">{{ m.descripcion || 'Sin descripción detallada para este bloque.' }}</p>
+
+        <footer class="mant-card__actions">
+          <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="openEditDialog(m)">
+            <span>Editar</span>
+            <span class="btn-island__icon"><i class="pi pi-pencil"></i></span>
+          </button>
+          <button type="button" class="btn-island btn-island--sm" [class.btn-island--danger]="m.isActive" (click)="toggleActive(m)">
+            <span>{{ m.isActive ? 'Desactivar' : 'Reactivar' }}</span>
+            <span class="btn-island__icon">
+              <i class="pi" [class.pi-eye-slash]="m.isActive" [class.pi-eye]="!m.isActive"></i>
+            </span>
+          </button>
+        </footer>
+      </div>
+    </article>
+  </div>
+
+  <!-- Dialog -->
+  <p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '38rem', maxWidth: '92vw' }"
+    [header]="editingId ? 'Editar mantenimiento' : 'Programar mantenimiento'"
+    (onHide)="closeDialog()"
+  >
+    <form [formGroup]="form" class="mant-form" (ngSubmit)="save()">
+      <div class="mant-form__row">
+        <div class="mant-form__field">
+          <label for="frm-pista">Pista</label>
+          <p-dropdown
+            id="frm-pista"
+            [options]="pistaOptions"
+            optionLabel="label"
+            optionValue="value"
+            formControlName="slugPista"
+            appendTo="body"
+            placeholder="Seleccionar pista"
+            [filter]="true"
+          ></p-dropdown>
+          <small *ngIf="formSubmitted && slugPistaControl.invalid" class="field-error">Selecciona una pista.</small>
+        </div>
+        <div class="mant-form__field">
+          <label for="frm-fecha">Fecha</label>
+          <p-calendar
+            id="frm-fecha"
+            formControlName="fechaMantenimiento"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+          ></p-calendar>
+          <small *ngIf="formSubmitted && fechaControl.invalid" class="field-error">Fecha obligatoria.</small>
+        </div>
+      </div>
+
+      <div class="mant-form__row">
+        <div class="mant-form__field">
+          <label for="frm-hi">Hora inicio</label>
+          <input id="frm-hi" type="time" pInputText formControlName="horaInicioMantenimiento" />
+          <small *ngIf="formSubmitted && horaInicioControl.invalid" class="field-error">Hora inicio obligatoria.</small>
+        </div>
+        <div class="mant-form__field">
+          <label for="frm-hf">Hora fin</label>
+          <input id="frm-hf" type="time" pInputText formControlName="horaFinMantenimiento" />
+          <small *ngIf="formSubmitted && horaFinControl.invalid" class="field-error">Hora fin obligatoria.</small>
+        </div>
+      </div>
+
+      <div class="mant-form__field">
+        <label for="frm-desc">Descripción</label>
+        <textarea id="frm-desc" rows="3" pInputTextarea formControlName="descripcionMantenimiento" placeholder="Ej. revisión de iluminación nocturna"></textarea>
+      </div>
+
+      <div class="mant-form__actions">
+        <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="closeDialog()">
+          <span>Cancelar</span>
+          <span class="btn-island__icon"><i class="pi pi-times"></i></span>
+        </button>
+        <button type="submit" class="btn-island">
+          <span>{{ editingId ? 'Guardar cambios' : 'Programar' }}</span>
+          <span class="btn-island__icon"><i class="pi pi-check"></i></span>
+        </button>
+      </div>
+    </form>
+  </p-dialog>
 </section>

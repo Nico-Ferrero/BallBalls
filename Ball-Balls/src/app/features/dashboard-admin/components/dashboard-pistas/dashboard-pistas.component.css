@@ -1,229 +1,160 @@
-.dashboard-module {
+.module {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
-.dashboard-module__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.dashboard-module__subtitle {
-  margin: 0.2rem 0 0;
-  color: var(--text-secondary, #457b9d);
-  font-size: 0.85rem;
-}
-
-.dashboard-module__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.dashboard-module h2 {
-  margin: 0;
-}
-
-.filters__card {
-  border: 1px solid var(--border-color, #a8dadc);
-  border-radius: 1rem;
-  background: var(--bg-card, #ffffff);
-  box-shadow: var(--shadow);
-  padding: 1rem;
+.kpi-strip {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.85rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: end;
 }
 
-.filters__field {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.filters__field label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 700;
-  color: var(--text-secondary, #457b9d);
-}
-
-.filters__field--inline .filters__price-row {
+.price-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-
-.filters__actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
+  gap: 0.4rem;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
 }
 
 .pista-card {
-  border: 1px solid var(--border-color, #a8dadc);
-  border-radius: 1rem;
-  background: var(--bg-card, #ffffff);
-  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-rows: 9.5rem 1fr;
   overflow: hidden;
 }
 
 .pista-card__media {
   position: relative;
-  height: 170px;
+  overflow: hidden;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-tertiary) 40%, transparent), color-mix(in srgb, var(--accent-secondary) 20%, transparent));
 }
 
 .pista-card__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  background: color-mix(in srgb, var(--accent-tertiary, #a8dadc) 20%, transparent);
+  display: block;
+  transition: transform 700ms var(--easing-spring);
 }
 
-.pista-card__badge {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: color-mix(in srgb, var(--accent-secondary, #457b9d) 16%, #ffffff);
-  color: var(--accent-secondary, #457b9d);
-}
-
-.pista-card__badge.is-inactive {
-  background: color-mix(in srgb, var(--text-muted, #6c8ea4) 20%, #ffffff);
-  color: var(--text-muted, #6c8ea4);
+.bezel--interactive:hover .pista-card__media img {
+  transform: scale(1.04);
 }
 
 .pista-card__content {
-  padding: 0.8rem;
+  padding: 1rem;
   display: grid;
   gap: 0.55rem;
+  align-content: start;
 }
 
 .pista-card__content h3 {
-  margin: 0;
-  font-size: 1.02rem;
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
-.pista-card__content p {
+.pista-card__desc {
   margin: 0;
-  color: var(--text-secondary, #457b9d);
+  color: var(--text-secondary);
   font-size: 0.85rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .pista-card__meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-
-.pista-card__meta strong {
-  color: var(--text-primary, #1d3557);
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-top: 1px dashed var(--hairline);
+  padding-top: 0.55rem;
+  margin-top: 0.25rem;
 }
 
 .pista-card__sports {
-  min-height: 2.25rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pista-card__actions {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.75rem;
-  border: 1px solid var(--border-color, #a8dadc);
-  border-radius: 0.75rem;
-  background: var(--bg-card, #ffffff);
-  padding: 0.75rem;
+  gap: 0.85rem;
 }
 
-.pagination span {
-  color: var(--text-secondary, #457b9d);
-  font-weight: 600;
-}
-
-.dashboard-module__state {
-  margin: 0;
-  color: var(--text-secondary, #457b9d);
-}
-
-.dashboard-module__state--error {
-  color: var(--accent-error, #d62828);
+.pagination__label {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
 }
 
 .pista-form {
   display: grid;
-  gap: 0.7rem;
+  gap: 0.85rem;
+  padding-top: 0.3rem;
 }
 
-.pista-form label {
+.pista-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pista-form__field {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.pista-form__field label {
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
   font-weight: 600;
-  color: var(--text-primary, #1d3557);
+}
+
+.field-invalid {
+  border-color: var(--accent-error) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-error) 18%, transparent) !important;
+}
+
+.field-error {
+  color: var(--accent-error);
+  font-size: 0.74rem;
 }
 
 .pista-form__actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
 }
 
-.field-invalid {
-  border-color: var(--accent-error, #d62828) !important;
-}
-
-.field-error {
-  color: var(--accent-error, #d62828);
-  font-size: 0.8rem;
-}
-
-:host ::ng-deep .p-dropdown,
-:host ::ng-deep .p-calendar,
-:host ::ng-deep .p-inputtext,
-:host ::ng-deep .p-inputtextarea,
-:host ::ng-deep .p-multiselect {
-  width: 100%;
-}
-
-@media (max-width: 1200px) {
-  .filters__card {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-module__header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .dashboard-module__actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .filters__card {
+@media (max-width: 640px) {
+  .pista-form__row {
     grid-template-columns: 1fr;
   }
 
-  .filters__actions {
-    justify-content: flex-start;
+  .pagination {
+    flex-direction: column;
   }
 }

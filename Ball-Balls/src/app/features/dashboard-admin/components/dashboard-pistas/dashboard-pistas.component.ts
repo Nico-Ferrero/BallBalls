@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { revealOnView } from '../../shared/motion.util';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -50,11 +51,14 @@ interface SelectOption {
   styleUrl: './dashboard-pistas.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardPistasComponent implements OnInit {
+export class DashboardPistasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly store = inject(Store);
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
+  private stopReveal: () => void = () => undefined;
 
   pageNumber = 1;
   pageSize = 6;
@@ -91,6 +95,26 @@ export class DashboardPistasComponent implements OnInit {
 
   get totalPages(): number {
     return this.pistasData()?.totalPages ?? 1;
+  }
+
+  readonly metrics = computed(() => {
+    const items = this.pistasData()?.items ?? [];
+    const total = this.pistasData()?.total ?? items.length;
+    const activas = items.filter((p) => p.isActive).length;
+    const precioMedio = items.length
+      ? Math.round(items.reduce((acc, p) => acc + (p.precio ?? 0), 0) / items.length)
+      : 0;
+    return { total, activas, inactivas: items.length - activas, precioMedio };
+  });
+
+  trackPistaBySlug = (_: number, p: { slug: string | null }) => p.slug ?? '';
+
+  ngAfterViewInit(): void {
+    queueMicrotask(() => { this.stopReveal = revealOnView(this.hostRef.nativeElement); });
+  }
+
+  ngOnDestroy(): void {
+    this.stopReveal();
   }
 
   ngOnInit(): void {

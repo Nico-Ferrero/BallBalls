@@ -3,12 +3,13 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, mergeMap, of } from 'rxjs';
 import * as DashboardAdminActions from './actions';
 import { DashboardAdminService } from '../dashboard-admin.service';
-import Swal from 'sweetalert2';
+import { DashboardToastService } from '../shared/dashboard-toast.service';
 
 @Injectable()
 export class DashboardAdminEffects {
   private readonly actions$ = inject(Actions);
   private readonly dashboardAdminService = inject(DashboardAdminService);
+  private readonly toasts = inject(DashboardToastService);
 
   loadStats$ = createEffect(() =>
     this.actions$.pipe(
@@ -73,11 +74,11 @@ export class DashboardAdminEffects {
       mergeMap(() =>
         this.dashboardAdminService.refreshSession().pipe(
           map(() => {
-            this.showSuccessToast('Sesion renovada correctamente.');
+            this.toasts.success('Sesion renovada correctamente.');
             return DashboardAdminActions.loadDashboardAdminAuth();
           }),
           catchError(() => {
-            this.showErrorToast('No se pudo renovar la sesion actual.');
+            this.toasts.error('No se pudo renovar la sesion actual.');
             return of(DashboardAdminActions.loadDashboardAdminAuth());
           })
         )
@@ -91,11 +92,11 @@ export class DashboardAdminEffects {
       mergeMap(() =>
         this.dashboardAdminService.logoutAllSessions().pipe(
           map(() => {
-            this.showSuccessToast('Se cerraron todas las sesiones activas.');
+            this.toasts.success('Se cerraron todas las sesiones activas.');
             return DashboardAdminActions.loadDashboardAdminAuth();
           }),
           catchError(() => {
-            this.showErrorToast('No se pudieron cerrar todas las sesiones.');
+            this.toasts.error('No se pudieron cerrar todas las sesiones.');
             return of(DashboardAdminActions.loadDashboardAdminAuth());
           })
         )
@@ -135,7 +136,7 @@ export class DashboardAdminEffects {
       mergeMap(({ request }) =>
         this.dashboardAdminService.createPista(request).pipe(
           map(() => {
-            this.showSuccessToast('Pista creada correctamente.');
+            this.toasts.success('Pista creada correctamente.');
             return DashboardAdminActions.loadDashboardAdminPistas({ pageNumber: 1, pageSize: 10 });
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminPistaFailure({ error: 'No se pudo crear la pista.' })))
@@ -150,7 +151,7 @@ export class DashboardAdminEffects {
       mergeMap(({ slug, request }) =>
         this.dashboardAdminService.updatePista(slug, request).pipe(
           map(() => {
-            this.showSuccessToast('Pista actualizada correctamente.');
+            this.toasts.success('Pista actualizada correctamente.');
             return DashboardAdminActions.loadDashboardAdminPistas({ pageNumber: 1, pageSize: 10 });
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminPistaFailure({ error: 'No se pudo actualizar la pista.' })))
@@ -165,7 +166,7 @@ export class DashboardAdminEffects {
       mergeMap(({ slug, request }) =>
         this.dashboardAdminService.togglePista(slug, request).pipe(
           map(() => {
-            this.showSuccessToast(request.isActive ? 'Pista activada.' : 'Pista desactivada.');
+            this.toasts.success(request.isActive ? 'Pista activada.' : 'Pista desactivada.');
             return DashboardAdminActions.loadDashboardAdminPistas({ pageNumber: 1, pageSize: 10 });
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminPistaFailure({ error: 'No se pudo cambiar el estado de la pista.' })))
@@ -180,7 +181,7 @@ export class DashboardAdminEffects {
       mergeMap(({ publicId }) =>
         this.dashboardAdminService.cancelReserva(publicId).pipe(
           map(() => {
-            this.showSuccessToast('Reserva cancelada correctamente.');
+            this.toasts.success('Reserva cancelada correctamente.');
             return DashboardAdminActions.loadDashboardAdminReservas({});
           }),
           catchError(() =>
@@ -221,7 +222,7 @@ export class DashboardAdminEffects {
       mergeMap(({ request }) =>
         this.dashboardAdminService.updateCurrentUser(request).pipe(
           map((user) => {
-            this.showSuccessToast('Usuario actualizado correctamente.');
+            this.toasts.success('Usuario actualizado correctamente.');
             return DashboardAdminActions.loadDashboardAdminUserSuccess({ user });
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminUserFailure({ error: 'No se pudo actualizar el usuario.' })))
@@ -236,7 +237,7 @@ export class DashboardAdminEffects {
       mergeMap(({ request }) =>
         this.dashboardAdminService.createDeporte(request).pipe(
           map(() => {
-            this.showSuccessToast('Deporte creado correctamente.');
+            this.toasts.success('Deporte creado correctamente.');
             return DashboardAdminActions.loadDashboardAdminDeportes();
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminDeporteFailure({ error: 'No se pudo crear el deporte.' })))
@@ -251,7 +252,7 @@ export class DashboardAdminEffects {
       mergeMap(({ slug, request }) =>
         this.dashboardAdminService.updateDeporte(slug, request).pipe(
           map(() => {
-            this.showSuccessToast('Deporte actualizado correctamente.');
+            this.toasts.success('Deporte actualizado correctamente.');
             return DashboardAdminActions.loadDashboardAdminDeportes();
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminDeporteFailure({ error: 'No se pudo actualizar el deporte.' })))
@@ -266,7 +267,7 @@ export class DashboardAdminEffects {
       mergeMap(({ slug, request }) =>
         this.dashboardAdminService.toggleDeporte(slug, request).pipe(
           map(() => {
-            this.showSuccessToast(request.isActive ? 'Deporte activado.' : 'Deporte desactivado.');
+            this.toasts.success(request.isActive ? 'Deporte activado.' : 'Deporte desactivado.');
             return DashboardAdminActions.loadDashboardAdminDeportes();
           }),
           catchError(() => of(DashboardAdminActions.mutateDashboardAdminDeporteFailure({ error: 'No se pudo cambiar el estado del deporte.' })))
@@ -279,7 +280,7 @@ export class DashboardAdminEffects {
     () =>
       this.actions$.pipe(
         ofType(DashboardAdminActions.mutateDashboardAdminDeporteFailure),
-        map(({ error }) => this.showErrorToast(error))
+        map(({ error }) => this.toasts.error(error))
       ),
     { dispatch: false }
   );
@@ -288,7 +289,7 @@ export class DashboardAdminEffects {
     () =>
       this.actions$.pipe(
         ofType(DashboardAdminActions.mutateDashboardAdminReservaFailure),
-        map(({ error }) => this.showErrorToast(error))
+        map(({ error }) => this.toasts.error(error))
       ),
     { dispatch: false }
   );
@@ -297,7 +298,7 @@ export class DashboardAdminEffects {
     () =>
       this.actions$.pipe(
         ofType(DashboardAdminActions.mutateDashboardAdminUserFailure),
-        map(({ error }) => this.showErrorToast(error))
+        map(({ error }) => this.toasts.error(error))
       ),
     { dispatch: false }
   );
@@ -306,48 +307,69 @@ export class DashboardAdminEffects {
     () =>
       this.actions$.pipe(
         ofType(DashboardAdminActions.mutateDashboardAdminPistaFailure),
-        map(({ error }) => this.showErrorToast(error))
+        map(({ error }) => this.toasts.error(error))
       ),
     { dispatch: false }
   );
 
-  private showSuccessToast(message: string): void {
-    const palette = this.getToastPalette();
+  createMantenimiento$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardAdminActions.createDashboardAdminMantenimiento),
+      mergeMap(({ request }) =>
+        this.dashboardAdminService.createMantenimiento(request).pipe(
+          map(() => {
+            this.toasts.success('Mantenimiento programado.');
+            return DashboardAdminActions.loadDashboardAdminMantenimientos();
+          }),
+          catchError(() =>
+            of(DashboardAdminActions.mutateDashboardAdminMantenimientoFailure({ error: 'No se pudo crear el mantenimiento.' }))
+          )
+        )
+      )
+    )
+  );
 
-    void Swal.fire({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2400,
-      timerProgressBar: true,
-      icon: 'success',
-      title: message,
-      background: palette.background,
-      color: palette.color
-    });
-  }
+  updateMantenimiento$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardAdminActions.updateDashboardAdminMantenimiento),
+      mergeMap(({ publicId, request }) =>
+        this.dashboardAdminService.updateMantenimiento(publicId, request).pipe(
+          map(() => {
+            this.toasts.success('Mantenimiento actualizado.');
+            return DashboardAdminActions.loadDashboardAdminMantenimientos();
+          }),
+          catchError(() =>
+            of(DashboardAdminActions.mutateDashboardAdminMantenimientoFailure({ error: 'No se pudo actualizar el mantenimiento.' }))
+          )
+        )
+      )
+    )
+  );
 
-  private showErrorToast(message: string): void {
-    const palette = this.getToastPalette();
+  toggleMantenimiento$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardAdminActions.toggleDashboardAdminMantenimiento),
+      mergeMap(({ publicId, request }) =>
+        this.dashboardAdminService.updateMantenimiento(publicId, request).pipe(
+          map(() => {
+            this.toasts.success(request.isActive ? 'Mantenimiento reactivado.' : 'Mantenimiento desactivado.');
+            return DashboardAdminActions.loadDashboardAdminMantenimientos();
+          }),
+          catchError(() =>
+            of(DashboardAdminActions.mutateDashboardAdminMantenimientoFailure({ error: 'No se pudo cambiar el estado del mantenimiento.' }))
+          )
+        )
+      )
+    )
+  );
 
-    void Swal.fire({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2800,
-      timerProgressBar: true,
-      icon: 'error',
-      title: message,
-      background: palette.background,
-      color: palette.color
-    });
-  }
+  mutateMantenimientoFailureToast$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardAdminActions.mutateDashboardAdminMantenimientoFailure),
+        map(({ error }) => this.toasts.error(error))
+      ),
+    { dispatch: false }
+  );
 
-  private getToastPalette(): { background: string; color: string } {
-    const isDark = document?.documentElement?.classList.contains('dark') ?? false;
-
-    return isDark
-      ? { background: '#1D3557', color: '#F1FAEE' }
-      : { background: '#FFFFFF', color: '#1D3557' };
-  }
 }

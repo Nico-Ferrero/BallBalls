@@ -1,57 +1,113 @@
-<section class="dashboard-module">
-  <header class="dashboard-module__header">
-    <h2>Deportes</h2>
-    <div class="dashboard-module__actions">
-      <span *ngIf="deportesData() as data">Total: {{ data.total }}</span>
-      <button pButton type="button" label="Nuevo" icon="pi pi-plus" (click)="openCreateDialog()"></button>
+<section class="module" #host>
+  <header class="module-header" data-reveal>
+    <div class="module-header__title">
+      <span class="eyebrow"><span class="eyebrow__dot"></span>Catálogo</span>
+      <h2>Deportes</h2>
+      <p>Familias deportivas disponibles para asignar a las pistas del centro.</p>
+    </div>
+
+    <div class="module-header__actions">
+      <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="quickDeactivate()">
+        <span>Desactivar primero</span>
+        <span class="btn-island__icon"><i class="pi pi-eye-slash"></i></span>
+      </button>
+      <button type="button" class="btn-island" (click)="openCreateDialog()">
+        <span>Nuevo deporte</span>
+        <span class="btn-island__icon"><i class="pi pi-plus"></i></span>
+      </button>
     </div>
   </header>
 
-  <div class="dashboard-module__crud">
-    <button pButton type="button" label="Crear" icon="pi pi-plus" (click)="openCreateDialog()"></button>
-    <button pButton type="button" label="Actualizar" icon="pi pi-refresh" (click)="quickUpdate()"></button>
-    <button pButton type="button" label="Desactivar" icon="pi pi-eye-slash" severity="danger" (click)="quickDeactivate()"></button>
+  <div class="kpi-strip" data-reveal>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-compass"></i></span>Total</span>
+        <strong class="kpi-tile__value">{{ metrics().total }}</strong>
+        <span class="kpi-tile__delta">Familias registradas</span>
+      </div>
+    </article>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-check-circle"></i></span>Activos</span>
+        <strong class="kpi-tile__value">{{ metrics().activos }}</strong>
+        <span class="kpi-tile__delta kpi-tile__delta--up">Disponibles ahora</span>
+      </div>
+    </article>
+    <article class="bezel bezel--interactive">
+      <div class="bezel__core kpi-tile">
+        <span class="kpi-tile__label"><span class="kpi-tile__icon"><i class="pi pi-ban"></i></span>Inactivos</span>
+        <strong class="kpi-tile__value">{{ metrics().inactivos }}</strong>
+        <span class="kpi-tile__delta">Archivados</span>
+      </div>
+    </article>
   </div>
 
-  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando deportes...</p>
+  <p *ngIf="isLoading()" class="dashboard-module__state">Cargando deportes…</p>
   <p *ngIf="error()" class="dashboard-module__state dashboard-module__state--error">{{ error() }}</p>
 
-  <p-table
-    *ngIf="deportesData() as data"
-    [value]="data.items"
-    [paginator]="true"
-    [rows]="8"
-    responsiveLayout="scroll"
-    styleClass="dashboard-table"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Nombre</th>
-        <th>Descripcion</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-deporte>
-      <tr>
-        <td>{{ deporte.nombre || '-' }}</td>
-        <td>{{ deporte.descripcion || 'Sin descripcion' }}</td>
-        <td>
-          <span class="status" [class.inactive]="!deporte.isActive">{{ deporte.isActive ? 'Activo' : 'Inactivo' }}</span>
-        </td>
-        <td class="actions-cell">
-          <button pButton type="button" icon="pi pi-pencil" class="p-button-text" (click)="openEditDialog(deporte)"></button>
-          <button
-            pButton
-            type="button"
-            [icon]="deporte.isActive ? 'pi pi-eye-slash' : 'pi pi-eye'"
-            class="p-button-text"
-            (click)="toggleActive(deporte)"
-          ></button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <div class="bezel" *ngIf="deportesData() as data" data-reveal>
+    <div class="bezel__core deportes-table-wrap">
+      <p-table
+        [value]="data.items"
+        [paginator]="data.items.length > 8"
+        [rows]="8"
+        responsiveLayout="scroll"
+        styleClass="dashboard-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-deporte>
+          <tr>
+            <td>
+              <strong>{{ deporte.nombre || '-' }}</strong>
+              <div class="row-slug">{{ deporte.slug }}</div>
+            </td>
+            <td class="row-desc">{{ deporte.descripcion || 'Sin descripción' }}</td>
+            <td>
+              <span class="pill" [class.pill--success]="deporte.isActive" [class.pill--neutral]="!deporte.isActive">
+                {{ deporte.isActive ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="openEditDialog(deporte)">
+                <span>Editar</span>
+                <span class="btn-island__icon"><i class="pi pi-pencil"></i></span>
+              </button>
+              <button
+                type="button"
+                class="btn-island btn-island--sm"
+                [class.btn-island--danger]="deporte.isActive"
+                [class.btn-island--ghost]="!deporte.isActive"
+                (click)="toggleActive(deporte)"
+              >
+                <span>{{ deporte.isActive ? 'Desactivar' : 'Reactivar' }}</span>
+                <span class="btn-island__icon">
+                  <i class="pi" [class.pi-eye-slash]="deporte.isActive" [class.pi-eye]="!deporte.isActive"></i>
+                </span>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <span class="empty-state__icon"><i class="pi pi-compass"></i></span>
+                <h3>Sin deportes todavía</h3>
+                <p>Empieza creando el primer deporte para asignar a las pistas.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
 
   <p-dialog
     [(visible)]="dialogVisible"
@@ -60,27 +116,37 @@
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '32rem' }"
-    [header]="editingSlug ? 'Editar Deporte' : 'Nuevo Deporte'"
+    [header]="editingSlug ? 'Editar deporte' : 'Nuevo deporte'"
     (onHide)="closeDialog()"
   >
     <form [formGroup]="form" class="deporte-form" (ngSubmit)="save()">
-      <label for="nombre">Nombre</label>
-      <input
-        id="nombre"
-        type="text"
-        pInputText
-        formControlName="nombre"
-        [class.field-invalid]="formSubmitted && nombreControl.invalid"
-      />
-      <small *ngIf="formSubmitted && nombreControl.hasError('required')" class="field-error">El nombre es obligatorio.</small>
-      <small *ngIf="formSubmitted && nombreControl.hasError('maxlength')" class="field-error">Maximo 100 caracteres.</small>
+      <div class="deporte-form__field">
+        <label for="nombre">Nombre</label>
+        <input
+          id="nombre"
+          type="text"
+          pInputText
+          formControlName="nombre"
+          [class.field-invalid]="formSubmitted && nombreControl.invalid"
+        />
+        <small *ngIf="formSubmitted && nombreControl.hasError('required')" class="field-error">El nombre es obligatorio.</small>
+        <small *ngIf="formSubmitted && nombreControl.hasError('maxlength')" class="field-error">Máximo 100 caracteres.</small>
+      </div>
 
-      <label for="descripcion">Descripcion</label>
-      <textarea id="descripcion" rows="4" pInputTextarea formControlName="descripcion"></textarea>
+      <div class="deporte-form__field">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" rows="4" pInputTextarea formControlName="descripcion" placeholder="Breve descripción del deporte"></textarea>
+      </div>
 
       <div class="deporte-form__actions">
-        <button pButton type="button" label="Cancelar" class="p-button-text" (click)="closeDialog()"></button>
-        <button pButton type="submit" label="Guardar"></button>
+        <button type="button" class="btn-island btn-island--ghost btn-island--sm" (click)="closeDialog()">
+          <span>Cancelar</span>
+          <span class="btn-island__icon"><i class="pi pi-times"></i></span>
+        </button>
+        <button type="submit" class="btn-island">
+          <span>{{ editingSlug ? 'Guardar' : 'Crear' }}</span>
+          <span class="btn-island__icon"><i class="pi pi-check"></i></span>
+        </button>
       </div>
     </form>
   </p-dialog>
