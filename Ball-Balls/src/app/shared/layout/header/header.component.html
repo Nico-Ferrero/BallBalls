@@ -26,6 +26,13 @@
                 class="text-secondary hover:text-primary transition-colors no-underline">Ranking</a>
             <a routerLink="/torneos" routerLinkActive="text-accent-primary font-semibold"
                 class="text-secondary hover:text-primary transition-colors no-underline">Torneos</a>
+            @if (isAdmin()) {
+            <a routerLink="/dashboard-admin" routerLinkActive="text-accent-primary font-semibold"
+                class="flex items-center gap-1.5 text-secondary hover:text-primary transition-colors no-underline">
+                <lucide-icon [name]="LayoutDashboard" [size]="16"></lucide-icon>
+                Dashboard
+            </a>
+            }
         </div>
 
         <!-- Right Actions -->
@@ -97,6 +104,14 @@
                         </a>
                     </div>
 
+                    @if (isAdmin()) {
+                    <a routerLink="/dashboard-admin" (click)="closeUserMenu()"
+                        class="flex items-center justify-center gap-2 p-3 mb-2 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-xl transition-colors text-accent-primary no-underline border border-accent-primary/30 font-semibold">
+                        <lucide-icon [name]="LayoutDashboard" [size]="18"></lucide-icon>
+                        <span class="text-sm">Dashboard Admin</span>
+                    </a>
+                    }
+
                     <div class="h-px bg-border-color my-3"></div>
 
                     <!-- Logout Button -->
@@ -147,6 +162,13 @@
             class="text-lg font-medium text-primary p-3 hover:bg-tertiary rounded-lg transition-colors no-underline">Ranking</a>
         <a routerLink="/torneos" (click)="isMenuOpen = false" routerLinkActive="text-accent-primary bg-tertiary"
             class="text-lg font-medium text-primary p-3 hover:bg-tertiary rounded-lg transition-colors no-underline">Torneos</a>
+        @if (isAdmin()) {
+        <a routerLink="/dashboard-admin" (click)="isMenuOpen = false" routerLinkActive="text-accent-primary bg-tertiary"
+            class="flex items-center gap-2 text-lg font-medium text-primary p-3 hover:bg-tertiary rounded-lg transition-colors no-underline">
+            <lucide-icon [name]="LayoutDashboard" [size]="18"></lucide-icon>
+            Dashboard Admin
+        </a>
+        }
 
         <div class="h-px bg-border-color my-1"></div>
 

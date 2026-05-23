@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SkeletonModule } from 'primeng/skeleton';
-import { AiSuggestionsService } from '../../core/services/ai-suggestions.service';
 
 // NgRx
 import { Store } from '@ngrx/store';
@@ -37,7 +36,6 @@ export class ProfileComponent implements OnInit {
     private store = inject(Store);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    readonly ai = inject(AiSuggestionsService);
 
     // Global State Signals
     currentUser = this.store.selectSignal(selectCurrentUser);

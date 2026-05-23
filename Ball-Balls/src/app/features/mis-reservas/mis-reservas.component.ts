@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import { SkeletonModule } from 'primeng/skeleton';
+import { DialogModule } from 'primeng/dialog';
 import Swal from 'sweetalert2';
 
 import { LucideAngularModule, Calendar, MapPin, Activity, ArrowRight, Inbox } from 'lucide-angular';
@@ -14,14 +13,21 @@ import { selectCurrentUser } from '../auth/store/selectors';
 import { ProfilesService } from '../../core/services/profiles.service';
 import { ReservasService } from '../../core/services/reservas.service';
 import { PistasService } from '../../core/services/pistas.service';
+import { AiSuggestionsService } from '../../core/services/ai-suggestions.service';
 import { Reserva, ReservasResponse } from '../../core/interfaces/Reservas/Reservas.Interface';
+import { Pista } from '../../core/interfaces/Pistas/Pistas.Interface';
 import { ProfileResponse } from '../../core/interfaces/Users/ProfileResponse.interface';
 import { cancelReserva, cancelReservaSuccess } from '../profile/store/actions';
+
+interface PistaInfo {
+  nombre: string;
+  slug: string | null;
+}
 
 @Component({
   selector: 'app-mis-reservas',
   standalone: true,
-  imports: [CommonModule, RouterLink, SkeletonModule, LucideAngularModule],
+  imports: [CommonModule, RouterLink, SkeletonModule, DialogModule, LucideAngularModule],
   templateUrl: './mis-reservas.component.html',
   styleUrls: ['./mis-reservas.component.css']
 })
@@ -31,6 +37,7 @@ export class MisReservasComponent implements OnInit {
   private profilesService = inject(ProfilesService);
   private reservasService = inject(ReservasService);
   private pistasService = inject(PistasService);
+  readonly aiService = inject(AiSuggestionsService);
 
   readonly Calendar = Calendar;
   readonly MapPin = MapPin;
@@ -42,7 +49,7 @@ export class MisReservasComponent implements OnInit {
 
   profile = signal<ProfileResponse | null>(null);
   reservas = signal<Reserva[]>([]);
-  pistaNames = signal<Record<string, string>>({});
+  pistaIndex = signal<Record<string, PistaInfo>>({});
   isLoading = signal(true);
   error = signal<string | null>(null);
   cancellingId = signal<string | null>(null);
@@ -66,6 +73,8 @@ export class MisReservasComponent implements OnInit {
       }
     });
 
+    this.loadPistaIndex();
+
     this.actions$.pipe(ofType(cancelReservaSuccess)).subscribe(({ publicId }) => {
       this.cancellingId.set(null);
       this.reservas.update(lista =>
@@ -80,7 +89,7 @@ export class MisReservasComponent implements OnInit {
       next: (response: ReservasResponse) => {
         this.reservas.set(response.reservas);
         this.isLoading.set(false);
-        this.resolvePistaNames(response.reservas);
+        this.aiService.loadSuggestions(response.reservas);
       },
       error: () => {
         this.error.set('No se pudieron cargar tus reservas.');
@@ -89,42 +98,35 @@ export class MisReservasComponent implements OnInit {
     });
   }
 
-  private resolvePistaNames(reservas: Reserva[]) {
-    const ids = Array.from(new Set(
-      reservas.map(r => r.pista).filter((p): p is string => !!p)
-    ));
-    if (ids.length === 0) return;
-
-    const lookups = ids.map(id =>
-      this.pistasService.getPistaById(id).pipe(
-        map(pista => ({ id, nombre: pista.nombre ?? id, slug: pista.slug ?? id })),
-        catchError(() => of({ id, nombre: id, slug: id }))
-      )
-    );
-
-    forkJoin(lookups).subscribe(results => {
-      const map: Record<string, string> = {};
-      const slugs: Record<string, string> = {};
-      for (const r of results) {
-        map[r.id] = r.nombre;
-        slugs[r.id] = r.slug;
-      }
-      this.pistaNames.set(map);
-      this.pistaSlugs.set(slugs);
+  private loadPistaIndex() {
+    this.pistasService.getPistas({ PageSize: 1000 }).subscribe({
+      next: (response) => {
+        const map: Record<string, PistaInfo> = {};
+        for (const p of response.items as Pista[]) {
+          const nombre = p.nombre ?? p.slug ?? 'Pista';
+          const slug = p.slug ?? null;
+          if (p.id) map[p.id] = { nombre, slug };
+          if (p.slug) map[p.slug] = { nombre, slug };
+        }
+        this.pistaIndex.set(map);
+      },
+      error: () => { /* fall back to UUID display */ }
     });
   }
 
-  pistaSlugs = signal<Record<string, string>>({});
-
   getPistaNombre(pista: string | null | undefined): string {
     if (!pista) return 'No identificada';
-    return this.pistaNames()[pista] ?? pista;
+    return this.pistaIndex()[pista]?.nombre ?? pista;
   }
 
   getPistaSlug(pista: string | null | undefined): string | null {
     if (!pista) return null;
-    return this.pistaSlugs()[pista] ?? null;
+    return this.pistaIndex()[pista]?.slug ?? null;
   }
+
+  /** Puente p-dialog [(visible)] ↔ AiSuggestionsService signal */
+  get dialogVisibleValue() { return this.aiService.dialogOpen(); }
+  set dialogVisibleValue(val: boolean) { val ? this.aiService.openDialog() : this.aiService.closeDialog(); }
 
   isUpcoming(reserva: Reserva): boolean {
     if (!reserva.fechaHoraInicio) return false;
@@ -185,5 +187,18 @@ export class MisReservasComponent implements OnInit {
     if (n === 'PENDING') return 'Pendiente';
     if (n === 'CANCELLED') return 'Cancelada';
     return n || 'Desconocido';
+  }
+
+  getSuggestionStatusClass(estado: string | null | undefined): string {
+    if (!estado) return 'badge-available';
+    const n = estado.toLowerCase();
+    if (n === 'ocupada') return 'badge-occupied';
+    if (n === 'mantenimiento') return 'badge-maintenance';
+    return 'badge-available';
+  }
+
+  getSuggestionStatusLabel(estado: string | null | undefined): string {
+    if (!estado) return 'Disponible';
+    return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
   }
 }

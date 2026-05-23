@@ -2,7 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../../core/services/theme.service';
-import { LucideAngularModule, Moon, Sun, Menu, X, ChevronDown, User, Settings, LogOut, Wallet, Calendar } from 'lucide-angular';
+import { AuthService } from '../../../core/services/auth.service';
+import { LucideAngularModule, Moon, Sun, Menu, X, ChevronDown, User, Settings, LogOut, Wallet, Calendar, LayoutDashboard } from 'lucide-angular';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser, selectIsAuthenticated } from '../../../features/auth/store/selectors';
 import { logout } from '../../../features/auth/store/actions';
@@ -22,6 +23,7 @@ import { logout } from '../../../features/auth/store/actions';
 })
 export class HeaderComponent {
     themeService = inject(ThemeService);
+    private auth = inject(AuthService);
     private store = inject(Store);
 
     isMenuOpen = false;
@@ -37,10 +39,12 @@ export class HeaderComponent {
     readonly LogOut = LogOut;
     readonly Wallet = Wallet;
     readonly Calendar = Calendar;
+    readonly LayoutDashboard = LayoutDashboard;
 
     // Connect to store signals
     user = this.store.selectSignal(selectCurrentUser);
     isAuthenticated = this.store.selectSignal(selectIsAuthenticated);
+    isAdmin = this.auth.isAdmin;
 
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen;

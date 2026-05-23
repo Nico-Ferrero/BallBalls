@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { LoginRequest, RegisterRequest, LogoutRequest } from '../interfaces/Auth/AuthRequest.interface';
@@ -16,6 +16,27 @@ export class AuthService {
     // Perfil global en Auth (segun requiera arquitecturas de Signals)
     public currentUser = signal<UsuarioResponse | null>(null);
     private accessTokenSignal = signal<string | null>(null);
+
+    readonly roles = computed<string[]>(() => {
+        const token = this.accessTokenSignal();
+        if (!token) return [];
+        try {
+            const payloadPart = token.split('.')[1]
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+            const padded = payloadPart.padEnd(Math.ceil(payloadPart.length / 4) * 4, '=');
+            const payload = JSON.parse(atob(padded));
+            const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+                ?? payload.role
+                ?? payload.roles
+                ?? [];
+            return Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+        } catch {
+            return [];
+        }
+    });
+
+    readonly isAdmin = computed(() => this.roles().includes('Admin'));
 
     /**
      * Login - Almacena Access Token y retorna AuthResponse

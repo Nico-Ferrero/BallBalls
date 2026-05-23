@@ -3,20 +3,22 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
-import { DialogModule } from 'primeng/dialog';
 import { ReservasService } from '../../../../core/services/reservas.service';
 import { PistasService } from '../../../../core/services/pistas.service';
 import { Reserva, ReservasResponse } from '../../../../core/interfaces/Reservas/Reservas.Interface';
-import { AiSuggestionsService } from '../../../../core/services/ai-suggestions.service';
+import { Pista } from '../../../../core/interfaces/Pistas/Pistas.Interface';
 import { cancelReserva, cancelReservaSuccess } from '../../store/actions';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import Swal from 'sweetalert2';
+
+interface PistaInfo {
+  nombre: string;
+  slug: string | null;
+}
 
 @Component({
   selector: 'app-profile-reservas',
   standalone: true,
-  imports: [CommonModule, RouterLink, DialogModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './profile-reservas.component.html',
   styleUrl: './profile-reservas.component.css'
 })
@@ -25,18 +27,18 @@ export class ProfileReservasComponent {
 
   private reservasService = inject(ReservasService);
   private pistasService   = inject(PistasService);
-  readonly aiService      = inject(AiSuggestionsService);
   private store           = inject(Store);
   private actions$        = inject(Actions);
 
-  // Historial
   reservas    = signal<Reserva[]>([]);
-  pistaNames  = signal<Record<string, string>>({});
+  pistaIndex  = signal<Record<string, PistaInfo>>({});
   isLoading   = signal(true);
   error       = signal<string | null>(null);
   cancellingId = signal<string | null>(null);
 
   constructor() {
+    this.loadPistaIndex();
+
     effect(() => {
       const userProfile = this.profile();
       if (userProfile && userProfile.id) {
@@ -63,8 +65,6 @@ export class ProfileReservasComponent {
       next: (response: ReservasResponse) => {
         this.reservas.set(response.reservas);
         this.isLoading.set(false);
-        this.aiService.loadSuggestions(response.reservas);
-        this.resolvePistaNames(response.reservas);
       },
       error: () => {
         this.error.set('No se pudieron cargar tus reservas.');
@@ -73,34 +73,26 @@ export class ProfileReservasComponent {
     });
   }
 
-  private resolvePistaNames(reservas: Reserva[]) {
-    const ids = Array.from(new Set(
-      reservas.map(r => r.pista).filter((p): p is string => !!p)
-    ));
-    if (ids.length === 0) return;
-
-    const lookups = ids.map(id =>
-      this.pistasService.getPistaById(id).pipe(
-        map(pista => ({ id, nombre: pista.nombre ?? id })),
-        catchError(() => of({ id, nombre: id }))
-      )
-    );
-
-    forkJoin(lookups).subscribe(results => {
-      const map: Record<string, string> = {};
-      for (const r of results) map[r.id] = r.nombre;
-      this.pistaNames.set(map);
+  private loadPistaIndex() {
+    this.pistasService.getPistas({ PageSize: 1000 }).subscribe({
+      next: (response) => {
+        const map: Record<string, PistaInfo> = {};
+        for (const p of response.items as Pista[]) {
+          const nombre = p.nombre ?? p.slug ?? 'Pista';
+          const slug = p.slug ?? null;
+          if (p.id) map[p.id] = { nombre, slug };
+          if (p.slug) map[p.slug] = { nombre, slug };
+        }
+        this.pistaIndex.set(map);
+      },
+      error: () => { /* fall back to UUID display */ }
     });
   }
 
   getPistaNombre(pista: string | null | undefined): string {
     if (!pista) return 'No identificada';
-    return this.pistaNames()[pista] ?? pista;
+    return this.pistaIndex()[pista]?.nombre ?? pista;
   }
-
-  /** Puente p-dialog [(visible)] ↔ AiSuggestionsService signal */
-  get dialogVisibleValue() { return this.aiService.dialogOpen(); }
-  set dialogVisibleValue(val: boolean) { val ? this.aiService.openDialog() : this.aiService.closeDialog(); }
 
   onCancelarReserva(publicId: string) {
     Swal.fire({
@@ -120,18 +112,5 @@ export class ProfileReservasComponent {
         this.store.dispatch(cancelReserva({ publicId }));
       }
     });
-  }
-
-  getStatusClass(estado: string | null | undefined): string {
-    if (!estado) return 'badge-available';
-    const n = estado.toLowerCase();
-    if (n === 'ocupada')       return 'badge-occupied';
-    if (n === 'mantenimiento') return 'badge-maintenance';
-    return 'badge-available';
-  }
-
-  getStatusLabel(estado: string | null | undefined): string {
-    if (!estado) return 'Disponible';
-    return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
   }
 }
