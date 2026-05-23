@@ -5,9 +5,12 @@ import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { DialogModule } from 'primeng/dialog';
 import { ReservasService } from '../../../../core/services/reservas.service';
+import { PistasService } from '../../../../core/services/pistas.service';
 import { Reserva, ReservasResponse } from '../../../../core/interfaces/Reservas/Reservas.Interface';
 import { AiSuggestionsService } from '../../../../core/services/ai-suggestions.service';
 import { cancelReserva, cancelReservaSuccess } from '../../store/actions';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -21,12 +24,14 @@ export class ProfileReservasComponent {
   profile = input<any>();
 
   private reservasService = inject(ReservasService);
+  private pistasService   = inject(PistasService);
   readonly aiService      = inject(AiSuggestionsService);
   private store           = inject(Store);
   private actions$        = inject(Actions);
 
   // Historial
   reservas    = signal<Reserva[]>([]);
+  pistaNames  = signal<Record<string, string>>({});
   isLoading   = signal(true);
   error       = signal<string | null>(null);
   cancellingId = signal<string | null>(null);
@@ -59,12 +64,38 @@ export class ProfileReservasComponent {
         this.reservas.set(response.reservas);
         this.isLoading.set(false);
         this.aiService.loadSuggestions(response.reservas);
+        this.resolvePistaNames(response.reservas);
       },
       error: () => {
         this.error.set('No se pudieron cargar tus reservas.');
         this.isLoading.set(false);
       }
     });
+  }
+
+  private resolvePistaNames(reservas: Reserva[]) {
+    const ids = Array.from(new Set(
+      reservas.map(r => r.pista).filter((p): p is string => !!p)
+    ));
+    if (ids.length === 0) return;
+
+    const lookups = ids.map(id =>
+      this.pistasService.getPistaById(id).pipe(
+        map(pista => ({ id, nombre: pista.nombre ?? id })),
+        catchError(() => of({ id, nombre: id }))
+      )
+    );
+
+    forkJoin(lookups).subscribe(results => {
+      const map: Record<string, string> = {};
+      for (const r of results) map[r.id] = r.nombre;
+      this.pistaNames.set(map);
+    });
+  }
+
+  getPistaNombre(pista: string | null | undefined): string {
+    if (!pista) return 'No identificada';
+    return this.pistaNames()[pista] ?? pista;
   }
 
   /** Puente p-dialog [(visible)] ↔ AiSuggestionsService signal */

@@ -1,0 +1,163 @@
+<div class="min-h-screen bg-[var(--bg-body)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-[var(--accent-primary)]">
+                    <lucide-icon [name]="Calendar" [size]="28"></lucide-icon>
+                </div>
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">Mis Reservas</h1>
+                    <p class="text-[var(--text-secondary)] mt-1">Gestiona y consulta tus pistas reservadas</p>
+                </div>
+            </div>
+            <a routerLink="/pistas"
+                class="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-white px-5 py-2.5 rounded-full font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all no-underline">
+                Reservar una pista
+                <lucide-icon [name]="ArrowRight" [size]="18"></lucide-icon>
+            </a>
+        </div>
+
+        @if (isLoading()) {
+            <!-- Skeleton -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <p-skeleton height="6rem" styleClass="rounded-2xl"></p-skeleton>
+                <p-skeleton height="6rem" styleClass="rounded-2xl"></p-skeleton>
+                <p-skeleton height="6rem" styleClass="rounded-2xl"></p-skeleton>
+            </div>
+            <p-skeleton height="8rem" styleClass="rounded-2xl mb-4"></p-skeleton>
+            <p-skeleton height="8rem" styleClass="rounded-2xl mb-4"></p-skeleton>
+            <p-skeleton height="8rem" styleClass="rounded-2xl"></p-skeleton>
+        } @else if (error()) {
+            <div class="flex flex-col items-center justify-center p-12 bg-red-500/5 border border-red-500/20 rounded-3xl text-center shadow-md">
+                <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 text-3xl mb-4">
+                    <i class="pi pi-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-xl font-bold text-[var(--text-primary)]">{{ error() }}</h3>
+            </div>
+        } @else {
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Total reservas</p>
+                    <p class="text-3xl font-extrabold text-[var(--text-primary)] mt-2">{{ reservas().length }}</p>
+                </div>
+                <div class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Próximas</p>
+                    <p class="text-3xl font-extrabold text-[var(--accent-primary)] mt-2">{{ upcomingReservas().length }}</p>
+                </div>
+                <div class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Total invertido</p>
+                    <p class="text-3xl font-extrabold text-emerald-600 mt-2">{{ totalGastado() | currency:'EUR':'symbol':'1.2-2' }}</p>
+                </div>
+            </div>
+
+            @if (reservas().length === 0) {
+                <div class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-12 text-center shadow-sm">
+                    <div class="w-20 h-20 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center mx-auto mb-4 text-[var(--text-secondary)]">
+                        <lucide-icon [name]="Inbox" [size]="36"></lucide-icon>
+                    </div>
+                    <h3 class="text-xl font-bold text-[var(--text-primary)] mb-2">Aún no tienes reservas</h3>
+                    <p class="text-[var(--text-secondary)] mb-6">Explora nuestras pistas y reserva la que más te guste.</p>
+                    <a routerLink="/pistas"
+                        class="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-white px-6 py-3 rounded-full font-semibold no-underline hover:-translate-y-0.5 transition-transform shadow-md">
+                        Ver pistas disponibles
+                        <lucide-icon [name]="ArrowRight" [size]="18"></lucide-icon>
+                    </a>
+                </div>
+            } @else {
+
+                <!-- Próximas -->
+                @if (upcomingReservas().length > 0) {
+                    <section class="mb-10">
+                        <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-[var(--accent-primary)] rounded-full"></span>
+                            Próximas reservas
+                        </h2>
+                        <div class="grid gap-4">
+                            @for (reserva of upcomingReservas(); track reserva.publicId) {
+                                <ng-container *ngTemplateOutlet="reservaCard; context: { $implicit: reserva }"></ng-container>
+                            }
+                        </div>
+                    </section>
+                }
+
+                <!-- Historial -->
+                @if (pastReservas().length > 0) {
+                    <section>
+                        <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-6 bg-[var(--text-secondary)] rounded-full opacity-60"></span>
+                            Historial
+                        </h2>
+                        <div class="grid gap-4">
+                            @for (reserva of pastReservas(); track reserva.publicId) {
+                                <ng-container *ngTemplateOutlet="reservaCard; context: { $implicit: reserva }"></ng-container>
+                            }
+                        </div>
+                    </section>
+                }
+            }
+        }
+    </div>
+</div>
+
+<!-- Reserva Card Template -->
+<ng-template #reservaCard let-reserva>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[var(--bg-card)] p-5 rounded-2xl border border-[var(--border-color)] shadow-sm hover:shadow-md transition-all">
+        <div class="flex items-start gap-4 flex-1 min-w-0">
+            <div class="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-[var(--accent-primary)] shrink-0">
+                <lucide-icon [name]="MapPin" [size]="22"></lucide-icon>
+            </div>
+            <div class="flex flex-col min-w-0">
+                <span class="text-lg font-bold text-[var(--text-primary)] truncate">
+                    {{ getPistaNombre(reserva.pista) }}
+                </span>
+                <span class="text-sm text-[var(--text-secondary)] mt-0.5">
+                    {{ reserva.fechaHoraInicio | date:'EEEE, d MMM yyyy' }}
+                    · {{ reserva.fechaHoraInicio | date:'HH:mm' }} - {{ reserva.fechaHoraFin | date:'HH:mm' }}
+                </span>
+                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border"
+                          [class]="estadoBadgeClass(reserva.estado)">
+                        {{ estadoLabel(reserva.estado) }}
+                    </span>
+                    @if (reserva.tipo) {
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]">
+                            <lucide-icon [name]="Activity" [size]="12"></lucide-icon>
+                            {{ reserva.tipo }}
+                        </span>
+                    }
+                    <span class="text-xs text-[var(--text-muted)]">Ref: {{ reserva.publicId?.substring(0,8) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex md:flex-col items-end justify-between md:justify-center gap-3 md:gap-2 shrink-0">
+            <span class="text-2xl font-extrabold text-[var(--accent-primary)]">
+                {{ reserva.precioTotal | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+            <div class="flex items-center gap-2">
+                @if (getPistaSlug(reserva.pista); as slug) {
+                    <a [routerLink]="['/reservas', slug]"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-[var(--border-color)] hover:bg-[var(--bg-body)] transition-colors no-underline">
+                        Ver pista
+                    </a>
+                }
+                @if ((reserva.estado || '').toUpperCase() !== 'CANCELLED' && isUpcoming(reserva)) {
+                    <button
+                        (click)="onCancelarReserva(reserva.publicId!)"
+                        [disabled]="cancellingId() === reserva.publicId"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        @if (cancellingId() === reserva.publicId) {
+                            <i class="pi pi-spin pi-spinner"></i> Cancelando...
+                        } @else {
+                            <i class="pi pi-times-circle"></i> Cancelar
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</ng-template>
