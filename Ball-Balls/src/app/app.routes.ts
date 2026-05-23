@@ -51,6 +51,16 @@ export const routes: Routes = [
         loadChildren: () => import('./features/profile/profile.routes').then(m => m.profileRoutes)
     },
     {
+        path: 'mis-reservas',
+        canActivate: [authGuard],
+        providers: [
+            provideState('profile', profileReducer),
+            provideEffects([ProfileEffects])
+        ],
+        loadComponent: () => import('./features/mis-reservas/mis-reservas.component').then(m => m.MisReservasComponent),
+        title: 'Mis Reservas - Ball&Balls'
+    },
+    {
         path: 'dashboard-admin',
         canActivate: [authGuard, roleGuard],
         data: { roles: ['Admin'] },
