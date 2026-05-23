@@ -68,44 +68,7 @@
 }
 
 /* Fix primeicons in input groups */
-::ng-deep .p-input-icon-left > i, 
+::ng-deep .p-input-icon-left > i,
 ::ng-deep .p-input-icon-right > i {
     z-index: 10;
-}
-
-/* ── FAB Sugerencias IA ────────────────────────────────── */
-.ai-fab {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 9999;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--accent-primary, #e63946);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    box-shadow: 0 4px 20px rgba(230, 57, 70, 0.45);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.ai-fab:hover {
-    transform: scale(1.12);
-    box-shadow: 0 6px 28px rgba(230, 57, 70, 0.6);
-}
-.ai-fab--loading {
-    cursor: wait;
-    animation: fab-pulse 1.4s infinite ease-in-out;
-}
-.ai-fab--error {
-    background: #6b7280;
-    box-shadow: 0 4px 16px rgba(107,114,128, 0.4);
-}
-@keyframes fab-pulse {
-    0%, 100% { box-shadow: 0 4px 20px rgba(230,57,70,.4); }
-    50%       { box-shadow: 0 4px 30px rgba(230,57,70,.75); }
 }

@@ -1,4 +1,5 @@
 export interface Pista {
+    id?: string;
     slug: string | null;
     nombre: string | null;
     descripcion: string | null;
